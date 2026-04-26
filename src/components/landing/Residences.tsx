@@ -1,18 +1,14 @@
 import { motion } from "framer-motion";
 import { MapPin, Users } from "lucide-react";
 import Image from "next/image";
-import residence1 from "@/assets/residence-1.jpg";
-import residence2 from "@/assets/residence-2.jpg";
-import residence3 from "@/assets/residence-3.jpg";
-import residence4 from "@/assets/residence-4.jpg";
-import residence5 from "@/assets/residence-5.jpg";
+
 
 const residences = [
-  { img: residence1, name: "Résidence Océane", location: "Front de mer", capacity: "120 chambres", tag: "Signature" },
-  { img: residence2, name: "Suite Lumière", location: "Centre-ville", capacity: "Vue panoramique", tag: "Premium" },
-  { img: residence5, name: "Studio Étudiant", location: "Quartier campus", capacity: "Bureau intégré", tag: "Étudiant" },
-  { img: residence3, name: "Lounge Privatif", location: "Aile sud", capacity: "Espace partagé", tag: "Lifestyle" },
-  { img: residence4, name: "Villa Piscine", location: "Jardins privés", capacity: "Spa & détente", tag: "Premium" },
+  { img: "/assets/residence-1.jpg", name: "Résidence Océane", location: "Front de mer", capacity: "120 chambres", tag: "Signature" },
+  { img: "/assets/residence-2.jpg", name: "Suite Lumière", location: "Centre-ville", capacity: "Vue panoramique", tag: "Premium" },
+  { img: "/assets/residence-5.jpg", name: "Studio Étudiant", location: "Quartier campus", capacity: "Bureau intégré", tag: "Étudiant" },
+  { img: "/assets/residence-3.jpg", name: "Lounge Privatif", location: "Aile sud", capacity: "Espace partagé", tag: "Lifestyle" },
+  { img: "/assets/residence-4.jpg", name: "Villa Piscine", location: "Jardins privés", capacity: "Spa & détente", tag: "Premium" },
 ];
 
 export const Residences = () => {

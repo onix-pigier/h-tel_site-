@@ -2,10 +2,7 @@ import { motion } from "framer-motion";
 import { Calendar, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import residence1 from "@/assets/residence-1.jpg";
-import residence2 from "@/assets/residence-2.jpg";
-import residence3 from "@/assets/residence-3.jpg";
-import residence4 from "@/assets/residence-4.jpg";
+
 
 interface HeroProps {
   onReserve: () => void;
@@ -87,7 +84,7 @@ export const Hero = ({ onReserve }: HeroProps) => {
               transition={{ duration: 0.3 }}
               className="col-span-4 row-span-4 rounded-3xl overflow-hidden shadow-elegant relative group"
             >
-              <Image src={residence1} alt="Résidence vue océan" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="/assets/residence-1.jpg" alt="Résidence vue océan" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 50vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
               <div className="absolute bottom-5 left-5 text-primary-foreground">
                 <div className="text-xs uppercase tracking-widest opacity-80">Signature</div>
@@ -99,7 +96,7 @@ export const Hero = ({ onReserve }: HeroProps) => {
               whileHover={{ scale: 1.02 }}
               className="col-span-2 row-span-3 rounded-3xl overflow-hidden shadow-elegant relative group animate-float"
             >
-              <Image src={residence3} alt="Lounge intérieur" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 25vw" />
+              <Image src="/assets/residence-3.jpg" alt="Lounge intérieur" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 25vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent" />
               <div className="absolute bottom-3 left-3 text-primary-foreground text-sm font-medium">Lounge</div>
             </motion.div>
@@ -108,7 +105,7 @@ export const Hero = ({ onReserve }: HeroProps) => {
               whileHover={{ scale: 1.02 }}
               className="col-span-2 row-span-3 rounded-3xl overflow-hidden shadow-elegant relative group"
             >
-              <Image src={residence2} alt="Chambre lumineuse" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 25vw" />
+              <Image src="/assets/residence-2.jpg" alt="Chambre lumineuse" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 25vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-accent/50 to-transparent" />
               <div className="absolute bottom-3 left-3 text-white text-sm font-medium">Suite Premium</div>
             </motion.div>
@@ -117,7 +114,7 @@ export const Hero = ({ onReserve }: HeroProps) => {
               whileHover={{ scale: 1.02 }}
               className="col-span-4 row-span-2 rounded-3xl overflow-hidden shadow-elegant relative group"
             >
-              <Image src={residence4} alt="Piscine extérieure" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="/assets/residence-4.jpg" alt="Piscine extérieure" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 50vw" />
               <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/20 to-transparent" />
               <div className="absolute top-1/2 -translate-y-1/2 left-5 text-primary-foreground">
                 <div className="text-xs uppercase tracking-widest opacity-80">Détente</div>
