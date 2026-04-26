@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum AppRole {
+  admin
+  manager
+  user
+}
+
+enum ChambreStatus {
+  disponible
+  occupee
+  maintenance
+}
+
+enum ReservationStatus {
+  en_attente
+  acceptee
+  refusee
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  firstName    String?    @map("first_name")
+  lastName     String?    @map("last_name")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  roles        UserRole[]
+
+  @@map("users")
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  role      AppRole
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@map("user_roles")
+}
+
+model Chambre {
+  id           String         @id @default(uuid())
+  numero       String         @unique
+  type         String
+  prix         Decimal        @default(0) @db.Decimal(10, 2)
+  capacite     Int            @default(1)
+  description  String?        @db.Text
+  status       ChambreStatus  @default(disponible)
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  attributions Attribution[]
+
+  @@map("chambres")
+}
+
+model Reservation {
+  id           String            @id @default(uuid())
+  firstName    String            @map("first_name")
+  lastName     String            @map("last_name")
+  email        String
+  phone        String
+  dateArrivee  DateTime?         @map("date_arrivee") @db.Date
+  dateDepart   DateTime?         @map("date_depart") @db.Date
+  notes        String?           @db.Text
+  status       ReservationStatus @default(en_attente)
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  attribution  Attribution?
+
+  @@map("reservations")
+}
+
+model Attribution {
+  id            String      @id @default(uuid())
+  reservationId String      @unique @map("reservation_id")
+  chambreId     String      @map("chambre_id")
+  checkIn       DateTime?   @map("check_in") @db.Date
+  checkOut      DateTime?   @map("check_out") @db.Date
+  createdAt     DateTime    @default(now()) @map("created_at")
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  chambre       Chambre     @relation(fields: [chambreId], references: [id], onDelete: Restrict)
+
+  @@map("attributions")
+}
