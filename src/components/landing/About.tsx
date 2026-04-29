@@ -1,11 +1,15 @@
+"use client";
+
+"use client";
+
 import { motion } from "framer-motion";
 import { Award, Heart, Shield, Sparkles } from "lucide-react";
 
 const values = [
-  { icon: Award, title: "Excellence", desc: "Un standard hôtelier reconnu, audité chaque année." },
+  { icon: Award, title: "Excellence & Standard", desc: "Un engagement permanent pour votre confort et une expérience de séjour irréprochable" },
   { icon: Heart, title: "Hospitalité", desc: "Chaque résident est accueilli comme un invité d'honneur." },
-  { icon: Shield, title: "Sécurité", desc: "Surveillance 24/7 et accès sécurisé par badge." },
-  { icon: Sparkles, title: "Innovation", desc: "Plateforme moderne pour gérer votre séjour en un clic." },
+  { icon: Shield, title: "Sécurité & Sérénité ", desc: "Profitez d'un séjour 24/24 pour un séjour de confiance." },
+  { icon: Sparkles, title: "Innovation & Digital", desc: "Simplifiez votre quotidien grâce à notre plateforme en ligne Réservez votre Séjour et vos demandes en un clic" },
 ];
 
 export const About = () => {
@@ -25,12 +29,10 @@ export const About = () => {
             À Propos
           </div>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-primary mb-6">
-            Notre mission : <span className="gradient-text italic">redéfinir</span> la résidence hôtelière.
+            Notre vision : <span className="gradient-text italic">réinventer</span> l'art de vivre en résidence.
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Depuis plus d&apos;une décennie, les Résidences Chanaude accueillent et hébergent les talents de demain.
-            Nous combinons l&apos;élégance d&apos;un hôtel cinq étoiles avec la chaleur d&apos;un foyer pensé pour
-            l&apos;apprentissage et le bien-être.
+             Vivez l&apos;ambition de demain : le confort d&apos;un chez-soi avec l&apos;élégance et  les services d&apos;un grand hôtel
           </p>
         </motion.div>
 

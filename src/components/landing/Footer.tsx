@@ -1,6 +1,9 @@
-import { Instagram, Twitter, Facebook, Linkedin, Mail, Phone, MapPin } from "lucide-react";
+
+"use client";
+import  { Facebook, Instagram, X, MessageCircle , Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { Residences } from './Residences';
 
 interface FooterProps {
   onReserve: () => void;
@@ -15,7 +18,7 @@ export const Footer = ({ onReserve }: FooterProps) => {
         {/* CTA */}
         <div className="text-center max-w-3xl mx-auto mb-20">
           <h2 className="font-display text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Prêt à rejoindre <span className="bg-gradient-to-r from-accent-glow to-white bg-clip-text text-transparent italic">Chanaude</span> ?
+            Prêt à rejoindre <span className="bg-gradient-to-r from-accent-glow to-white bg-clip-text text-transparent italic">Residences Les Chanaudes</span> ?
           </h2>
           <p className="text-white/70 text-lg mb-8">Réservez votre résidence en quelques minutes.</p>
           <Button
@@ -30,16 +33,17 @@ export const Footer = ({ onReserve }: FooterProps) => {
         <div className="grid md:grid-cols-4 gap-10 pt-12 border-t border-white/10">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center">
-                <Image src="/assets/logo.png" alt="Résidences Chanaude" width={40} height={40} className="object-contain" />
+              
+              <div className="w-20 h-20 rounded-xl bg-white flex items-center justify-center shadow-lg">
+                <Image src="/assets/logo.png" alt="Résidences Chanaude"  width={60} height={60} className="object-contain" />
               </div>
               <div>
-                <span className="font-display font-bold text-xl block leading-tight">Chanaude</span>
-                <span className="text-white/50 text-xs">Mondoukou</span>
+                <span className="font-display font-bold text-xl block leading-tight">Résidences Les Chanaudes</span>
+                <span className="text-white/50 text-xs">Bassam</span>
               </div>
             </div>
             <p className="text-white/60 text-sm leading-relaxed">
-              Les Résidences Chanaude Mondoukou. Résidences premium pour étudiants et professionnels.
+              Résidences Les chanaudes . Résidences de qualités pour tous.
             </p>
           </div>
 
@@ -56,8 +60,8 @@ export const Footer = ({ onReserve }: FooterProps) => {
           <div>
             <h4 className="font-display font-semibold mb-4">Contact</h4>
             <ul className="space-y-3 text-sm text-white/60">
-              <li className="flex items-start gap-2"><MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" /> Mondoukou, Abidjan, Côte d&apos;Ivoire</li>
-              <li className="flex items-center gap-2"><Phone className="w-4 h-4" /> +225 0102030405</li>
+              <li className="flex items-start gap-2"><MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" /> Mondoukou, Bassam Côte d&apos;Ivoire</li>
+              <li className="flex items-center gap-2"><Phone className="w-4 h-4" /> +225 0757716707  0707091665</li>
               <li className="flex items-center gap-2"><Mail className="w-4 h-4" /> contact@chanaude.ci</li>
             </ul>
           </div>
@@ -69,7 +73,7 @@ export const Footer = ({ onReserve }: FooterProps) => {
             </div>
             <h4 className="font-display font-semibold mb-3">Suivez-nous</h4>
             <div className="flex gap-3">
-              {[Instagram, Twitter, Facebook, Linkedin].map((Icon, i) => (
+              {[Instagram, X , Facebook, MessageCircle].map((Icon, i) => (
                 <a
                   key={i}
                   href="#"
@@ -84,7 +88,7 @@ export const Footer = ({ onReserve }: FooterProps) => {
         </div>
 
         <div className="pt-8 mt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/50">
-          <div suppressHydrationWarning>© {new Date().getFullYear()} Les Résidences Chanaude Mondoukou. Tous droits réservés.</div>
+          <div suppressHydrationWarning>© {new Date().getFullYear()} Résidences Les Chanaudes. Tous droits réservés.</div>
           <div className="flex gap-6">
             <a href="#" className="hover:text-white">Mentions légales</a>
             <a href="#" className="hover:text-white">Confidentialité</a>

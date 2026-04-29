@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { MapPin, Users } from "lucide-react";
 import Image from "next/image";
@@ -6,7 +8,7 @@ import Image from "next/image";
 const residences = [
   { img: "/assets/residence-1.png", name: "Résidence Océane", location: "Front de mer", capacity: "120 chambres", tag: "Signature" },
   { img: "/assets/residence-2.png", name: "Suite Lumière", location: "Centre-ville", capacity: "Vue panoramique", tag: "Premium" },
-  { img: "/assets/residence-5.png", name: "Studio Étudiant", location: "Quartier campus", capacity: "Bureau intégré", tag: "Étudiant" },
+  { img: "/assets/residence-5.png", name: "Studio Américain", location: "Quartier campus", capacity: "Bureau intégré", tag: "Beau" },
   { img: "/assets/residence-3.png", name: "Lounge Privatif", location: "Aile sud", capacity: "Espace partagé", tag: "Lifestyle" },
   { img: "/assets/residence-4.png", name: "Villa Piscine", location: "Jardins privés", capacity: "Spa & détente", tag: "Premium" },
 ];
@@ -26,7 +28,7 @@ export const Residences = () => {
               Nos Résidences
             </div>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-primary">
-              Cinq univers, une <span className="gradient-text italic">même exigence</span>.
+              Des univers, une <span className="gradient-text italic">même exigence</span>.
             </h2>
           </motion.div>
           <p className="text-muted-foreground md:max-w-sm">

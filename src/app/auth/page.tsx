@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Lock, Mail, ArrowLeft, Loader2 } from "lucide-react";
@@ -73,11 +74,11 @@ export default function AuthPage() {
         className="relative w-full max-w-md rounded-3xl glass shadow-elegant p-8"
       >
         <div className="text-center mb-7">
-          <div className="w-14 h-14 mx-auto rounded-2xl gradient-sunset flex items-center justify-center shadow-soft mb-4">
-            <Lock className="w-6 h-6 text-accent-foreground" />
+          <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center ">
+            <Image src="/assets/logo1.png" alt="Résidences Les Chanaudes" width={69} height={69} className="object-contain" />
           </div>
           <h1 className="font-display text-2xl font-bold text-primary">Espace Administration</h1>
-          <p className="text-sm text-muted-foreground mt-1">Connectez-vous avec vos identifiants admin</p>
+          <p className="text-sm text-muted-foreground mt-1">Connectez-vous</p>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
@@ -90,7 +91,7 @@ export default function AuthPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@chanaude.ci"
+                placeholder="votreemail@gmail.com"
                 className="pl-10 h-12 rounded-2xl bg-white/70"
                 autoComplete="email"
                 required
@@ -108,7 +109,7 @@ export default function AuthPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="pl-10 h-12 rounded-2xl bg-white/70"
+                className="pl-10 h-12 rounded-2xl bg-white/70 text-lg placeholder:text-lg tracking-widest"
                 autoComplete="current-password"
                 required
               />
@@ -123,8 +124,8 @@ export default function AuthPage() {
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Se connecter"}
           </Button>
 
-          <p className="text-xs text-center text-muted-foreground pt-2">
-            Les comptes administrateurs sont créés par le système.
+          <p className="text-xs text-center text-muted-foreground pt-2 opacity-80">
+            © {new Date().getFullYear()} Résidences Les Chanaudes. Tous droits réservés.
           </p>
         </form>
       </motion.div>

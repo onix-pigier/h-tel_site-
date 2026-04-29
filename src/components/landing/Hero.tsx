@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +12,9 @@ interface HeroProps {
 }
 
 export const Hero = ({ onReserve }: HeroProps) => {
+  const [tick, setTick] = useState(() => Date.now());
+  // helper pour mettre à jour manuellement l'état local afin d'observer Fast Refresh/Hot Reload
+  const bump = () => setTick(Date.now());
   return (
     <section id="hero" className="relative min-h-screen pt-28 pb-20 overflow-hidden grain">
       {/* Ambient gradients */}
@@ -27,7 +33,7 @@ export const Hero = ({ onReserve }: HeroProps) => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass shadow-soft">
               <Sparkles className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium text-primary">Les Résidences Chanaude Mondoukou</span>
+              <span className="text-sm font-medium text-primary"> Résidences Les Chanaudes</span>
             </div>
 
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] text-primary">
@@ -36,8 +42,7 @@ export const Hero = ({ onReserve }: HeroProps) => {
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-              Réservez votre résidence dans un cadre raffiné, pensé pour les étudiants et professionnels
-              en quête d&apos;élégance, de confort et de sérénité.
+              Réservez votre résidence dans un cadre raffiné, idéal pour vous detendre en famille ou entre amis.
             </p>
 
             <div className="flex flex-wrap gap-4 pt-2">
@@ -66,13 +71,14 @@ export const Hero = ({ onReserve }: HeroProps) => {
               </div>
               <div className="w-px h-12 bg-border" />
               <div>
-                <div className="font-display text-3xl font-bold text-primary">4.9★</div>
+                <div className="font-display text-3xl font-bold text-primary">4.7★</div>
                 <div className="text-sm text-muted-foreground">Note moyenne</div>
               </div>
             </div>
+          
           </motion.div>
 
-          {/* Bento grid — different photos from Residences section */}
+          {/* Bento grid — pour les photos des résidences */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -88,7 +94,7 @@ export const Hero = ({ onReserve }: HeroProps) => {
               <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
               <div className="absolute bottom-5 left-5 text-primary-foreground">
                 <div className="text-xs uppercase tracking-widest opacity-80">Bienvenue</div>
-                <div className="font-display text-xl font-semibold">Résidences Chanaude</div>
+                <div className="font-display text-xl font-semibold">Résidences les Chanaudes</div>
               </div>
             </motion.div>
 
