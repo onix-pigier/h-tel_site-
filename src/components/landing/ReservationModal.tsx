@@ -169,7 +169,7 @@ export const ReservationModal = ({ open, onClose }: ReservationModalProps) => {
                       <SelectTrigger className="h-12 rounded-2xl bg-white/70 border-border focus:ring-accent">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-[9999]">
                         {Object.entries(offerLabels).map(([value, label]) => (
                           <SelectItem key={value} value={value}>{label}</SelectItem>
                         ))}

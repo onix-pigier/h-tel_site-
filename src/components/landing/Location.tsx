@@ -30,7 +30,7 @@ export const Location = () => {
                 </div>
                 <div>
                   <div className="font-semibold text-primary">Adresse</div>
-                  <div className="text-sm text-muted-foreground">Abidjan côte d'ivoire</div>
+                  <div className="text-sm text-muted-foreground">Modoukou, Bassam Côte d'Ivoire</div>
                 </div>
               </div>
               <div className="flex items-start gap-4 p-4 rounded-2xl bg-card border border-border/60">
@@ -39,7 +39,7 @@ export const Location = () => {
                 </div>
                 <div>
                   <div className="font-semibold text-primary">Téléphone</div>
-                  <div className="text-sm text-muted-foreground">+225 0102030405</div>
+                  <div className="text-sm text-muted-foreground">+225 0757716707  0707091665</div>
                 </div>
               </div>
               <div className="flex items-start gap-4 p-4 rounded-2xl bg-card border border-border/60">
@@ -61,7 +61,7 @@ export const Location = () => {
             className="relative rounded-3xl overflow-hidden shadow-elegant h-[500px] bg-muted"
           >
             <iframe
-              title="Localisation Residences Chanaude"
+              title="Localisation Residences Les Chanaudes"
               src="https://www.openstreetmap.org/export/embed.html?bbox=-4.08%2C5.30%2C-3.95%2C5.38&layer=mapnik&marker=5.3364%2C-4.0267"
               className="w-full h-full border-0"
               loading="lazy"
@@ -71,8 +71,8 @@ export const Location = () => {
                 <Navigation className="w-5 h-5 text-white" />
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Chanaude</div>
-                <div className="font-semibold text-primary text-sm">Abidjan, Côte d’Ivoire</div>
+                <div className="text-xs text-muted-foreground">Résidences Les Chanaudes</div>
+                <div className="font-semibold text-primary text-sm">Bassam, Côte d’Ivoire</div>
               </div>
             </div>
           </motion.div>

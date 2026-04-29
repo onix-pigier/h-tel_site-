@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { label: "Accueil", id: "hero" },
   { label: "À Propos", id: "about" },
-  { label: "Services", id: "services" },
+  { label: "Nos Atouts", id: "services" },
   { label: "Nos Résidences", id: "residences" },
   { label: "Contact", id: "footer" },
 ];
@@ -45,9 +45,9 @@ export const Navbar = ({ onReserve }: NavbarProps) => {
         <div className="flex items-center justify-between gap-4">
           <button onClick={() => scrollTo("hero")} className="flex items-center gap-2 group">
             <div className="w-10 h-10 rounded-xl overflow-hidden shadow-soft group-hover:scale-110 transition-transform bg-white/80 flex items-center justify-center">
-              <Image src="/assets/logo.png" alt="Résidences Chanaude" width={36} height={36} className="object-contain" />
+              <Image src="/assets/logo.png" alt="Résidences Les Chanaudes" width={69} height={69} className="object-contain" />
             </div>
-            <span className="font-display font-bold text-primary hidden sm:block">Chanaude</span>
+            <span className="font-display font-bold text-primary hidden sm:block">Résidences Les Chanaudes</span>
           </button>
 
           <div className="hidden lg:flex items-center gap-1">

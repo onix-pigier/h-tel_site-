@@ -7,41 +7,45 @@ const baseUrl = process.env.NEXTAUTH_URL || "https://chanaude.ci";
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Résidences Chanaude Mondoukou — Résidences Premium à Abidjan",
-    template: "%s | Résidences Chanaude",
+    default: "Résidences Les Chanaudes Mondoukou — Résidences Premium Bassam",
+    template: "%s | Résidences Les Chanaudes",
   },
   description:
-    "Réservez votre résidence premium aux Résidences Chanaude Mondoukou. Cadre raffiné, services inclus, idéalement situé à Abidjan, Côte d'Ivoire.",
+    "Réservez votre résidence premium aux Résidences les Chanaudes. Cadre raffiné, services inclus, idéalement situé à Abidjan, Côte d'Ivoire.",
   keywords: [
+    "Lees chanaudes",
+    "résidences les chanaudes",
     "résidences chanaude",
-    "chanaude mondoukou",
+    "residence chanaude mondoukou",
+    "chanaudes mondoukou",
     "résidence",
     "réservation",
     "Côte d'Ivoire",
     "Abidjan",
+    "Bassam",
     "hébergement",
     "chambre",
     "logement",
     "hôtel",
   ],
-  authors: [{ name: "Résidences Chanaude" }],
-  creator: "Résidences Chanaude Mondoukou",
+  authors: [{ name: "Résidences Les Chanaudes" }],
+  creator: "Résidences Les Chanaudes ",
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Résidences Chanaude Mondoukou — Résidences Premium",
+    title: "Résidences Les Chanaudes — Résidences Premium",
     description:
-      "Vivez une expérience résidentielle d'exception. Résidences premium, services inclus, au cœur d'Abidjan.",
+      "Vivez une expérience résidentielle d'exception. Résidences premium, services inclus, à Bassam.",
     type: "website",
     locale: "fr_CI",
     url: baseUrl,
-    siteName: "Résidences Chanaude",
+    siteName: "Résidences Les Chanaudes",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Résidences Chanaude Mondoukou",
+    title: "Résidences Les Chanaudes",
     description:
-      "Réservez votre résidence premium aux Résidences Chanaude Mondoukou. Services inclus, cadre raffiné.",
+      "Réservez votre résidence aux Résidences Les Chanaudes. Services inclus, cadre raffiné.",
   },
 };
 
@@ -49,15 +53,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Hotel",
-    name: "Les Résidences Chanaude Mondoukou",
+    name: "Les Résidences Les Chanaudes",
     description:
-      "Résidences premium pour étudiants et professionnels à Mondoukou, Abidjan, Côte d'Ivoire.",
+      "Résidences ideals pour vous détendre en famille ou entre amis.",
     url: baseUrl,
     address: {
       "@type": "PostalAddress",
       addressCountry: "CI",
-      addressLocality: "Abidjan",
-      addressRegion: "Mondoukou",
+      addressLocality: "Bassam",
+      addressRegion: "Bassam",
     },
     priceRange: "25000 - 85000 FCFA",
     starRating: { "@type": "Rating", ratingValue: "4" },

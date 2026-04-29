@@ -1,15 +1,15 @@
+"use client";
+
 import { motion } from "framer-motion";
-import { UtensilsCrossed, BookOpen, Shirt, Wifi, Dumbbell, Coffee, Car, Sparkles } from "lucide-react";
+import { UtensilsCrossed, Wifi,Car, Sparkles, WavesIcon, HandshakeIcon } from "lucide-react";
+
 
 const services = [
-  { icon: UtensilsCrossed, title: "Restauration", desc: "Chef sur place, menus équilibrés et options internationales." },
-  { icon: BookOpen, title: "Espaces d'étude", desc: "Bibliothèques silencieuses et salles collaboratives." },
-  { icon: Shirt, title: "Blanchisserie", desc: "Service complet pour gagner du temps précieux." },
-  { icon: Wifi, title: "Internet Fibre", desc: "Connexion ultra-rapide dans toute la résidence." },
-  { icon: Dumbbell, title: "Salle de sport", desc: "Équipement moderne accessible 24h/24." },
-  { icon: Coffee, title: "Café & Lounge", desc: "Espaces conviviaux pour pauses et rencontres." },
-  { icon: Car, title: "Parking sécurisé", desc: "Stationnement souterrain avec borne de recharge." },
-  { icon: Sparkles, title: "Ménage hebdo", desc: "Entretien professionnel inclus dans votre séjour." },
+  { icon: UtensilsCrossed, title: "Restauration", desc: "Savourez vos repas face à l'horizon avec une vue imprenable sur l'eau.." },
+  { icon: WavesIcon, title: "Plage à 100m", desc: "Accès direct à une plage privée pour des moments de détente inoubliables." },
+  { icon: Wifi, title: "Internet Fibre", desc: "Une connexion ultra-rapide pour travailler ou vous divertir en toute fluidité." },
+  { icon: Car, title: "Parking sécurisé", desc: "Stationnez votre véhicule en toute tranquillité." },
+  { icon: HandshakeIcon, title: "Espace commun", desc: "Un lieu de vie convivial, idéal pour se détendre et se retrouver entre residents." },
 ];
 
 export const Services = () => {
@@ -25,13 +25,13 @@ export const Services = () => {
           className="max-w-2xl mb-16"
         >
           <div className="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-5">
-            Services Inclus
+              Nos Atouts
           </div>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-primary mb-5">
-            Tout ce dont vous avez besoin, <span className="gradient-text italic">déjà inclus.</span>
+            Un emplacement privilégié,  <span className="gradient-text italic">au cœur de l'essentiel.</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Concentrez-vous sur ce qui compte. Nous nous occupons du reste.
+              Profitez d’un environnement où tout est à proximité : plage, restaurants et commodités, pour un quotidien agréable et sans compromis.
           </p>
         </motion.div>
 
