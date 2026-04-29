@@ -73,7 +73,7 @@ export default function AuthPage() {
         className="relative w-full max-w-md rounded-3xl glass shadow-elegant p-8"
       >
         <div className="text-center mb-7">
-          <div className="w-14 h-14 mx-auto rounded-2xl gradient-teal flex items-center justify-center shadow-soft mb-4">
+          <div className="w-14 h-14 mx-auto rounded-2xl gradient-sunset flex items-center justify-center shadow-soft mb-4">
             <Lock className="w-6 h-6 text-accent-foreground" />
           </div>
           <h1 className="font-display text-2xl font-bold text-primary">Espace Administration</h1>
@@ -90,7 +90,7 @@ export default function AuthPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@Hôtel.ci"
+                placeholder="admin@chanaude.ci"
                 className="pl-10 h-12 rounded-2xl bg-white/70"
                 autoComplete="email"
                 required
@@ -118,7 +118,7 @@ export default function AuthPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 rounded-2xl gradient-teal text-accent-foreground font-semibold shadow-elegant"
+            className="w-full h-12 rounded-2xl gradient-sunset text-accent-foreground font-semibold shadow-elegant"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Se connecter"}
           </Button>

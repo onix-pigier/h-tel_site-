@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -36,11 +37,21 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/(.*)\\.(js|css|woff2?|ttf|ico|svg|png|jpg|webp|avif)",
+        source: "/api/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store, no-cache, must-revalidate, proxy-revalidate" },
+          { key: "Pragma", value: "no-cache" },
+          { key: "Expires", value: "0" },
+        ],
+      },
+      {
+        source: "/(.*)\\.(.*)$",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value: isProd
+              ? "public, max-age=31536000, immutable"
+              : "public, max-age=0, must-revalidate",
           },
         ],
       },

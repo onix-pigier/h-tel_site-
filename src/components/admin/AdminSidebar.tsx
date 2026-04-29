@@ -1,7 +1,8 @@
 "use client";
 
-import { Users, BedDouble, ClipboardList, Home, LogOut, Moon, Sun } from "lucide-react";
+import { BedDouble, ClipboardList, Home, LogOut, Moon, ReceiptText, Sun, UserSquare2, Users } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
@@ -20,9 +21,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { title: "Réservations", url: "/admin", icon: Users },
-  { title: "Chambres", url: "/admin/chambres", icon: BedDouble },
+  { title: "Réservations web", url: "/admin", icon: Users },
   { title: "Attributions", url: "/admin/attribuer", icon: ClipboardList },
+  { title: "Registre", url: "/admin/registre", icon: ReceiptText },
+  { title: "Clients", url: "/admin/clients", icon: UserSquare2 },
+  { title: "Chambres", url: "/admin/chambres", icon: BedDouble },
 ];
 
 export const AdminSidebar = () => {
@@ -47,14 +50,14 @@ export const AdminSidebar = () => {
     <Sidebar collapsible="icon">
       <SidebarContent>
         <div className={cn("flex items-center gap-2 px-4 py-5", collapsed && "justify-center px-2")}>
-          <div className="w-9 h-9 rounded-xl gradient-teal flex items-center justify-center shadow-soft shrink-0">
-            <span className="font-display font-bold text-accent-foreground">H</span>
+          <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/80 flex items-center justify-center shadow-soft shrink-0">
+            <Image src="/assets/logo.png" alt="Chanaude" width={32} height={32} className="object-contain" />
           </div>
-          {!collapsed && <span className="font-display font-bold text-primary">Hôtel.ci Admin</span>}
+          {!collapsed && <span className="font-display font-bold text-primary">Chanaude Admin</span>}
         </div>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Gestion</SidebarGroupLabel>
+          <SidebarGroupLabel>Exploitation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -89,10 +92,7 @@ export const AdminSidebar = () => {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="hover:bg-muted/60"
-                >
+                <SidebarMenuButton onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="hover:bg-muted/60">
                   {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                   {!collapsed && <span>{theme === "dark" ? "Mode clair" : "Mode sombre"}</span>}
                 </SidebarMenuButton>
@@ -103,9 +103,7 @@ export const AdminSidebar = () => {
       </SidebarContent>
 
       <SidebarFooter>
-        {!collapsed && user && (
-          <div className="px-3 pb-2 text-xs text-muted-foreground truncate">{user.email}</div>
-        )}
+        {!collapsed && user && <div className="px-3 pb-2 text-xs text-muted-foreground truncate">{user.email}</div>}
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} className="hover:bg-destructive/10 hover:text-destructive">

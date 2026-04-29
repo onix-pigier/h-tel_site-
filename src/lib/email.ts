@@ -27,7 +27,7 @@ function getTransporter() {
   });
 }
 
-const FROM = process.env.SMTP_FROM ?? "Hôtel.ci <noreply@Hôtel.ci>";
+const FROM = process.env.SMTP_FROM ?? "Résidences Chanaude <noreply@chanaude.ci>";
 
 async function sendMail(to: string, subject: string, html: string) {
   const transporter = getTransporter();
@@ -57,7 +57,7 @@ export async function sendReservationReceived(
 ) {
   return sendMail(
     to,
-    "Hôtel.ci — Votre demande de réservation a été reçue",
+    "Résidences Chanaude — Votre demande de réservation a été reçue",
     templateReservationReceived(firstName, lastName)
   );
 }
@@ -70,7 +70,7 @@ export async function sendReservationAccepted(
 ) {
   return sendMail(
     to,
-    "Hôtel.ci — Votre réservation est acceptée ! 🎉",
+    "Résidences Chanaude — Votre réservation est acceptée ! 🎉",
     templateReservationAccepted(firstName, lastName, chambreInfo)
   );
 }
@@ -82,7 +82,7 @@ export async function sendReservationRefused(
 ) {
   return sendMail(
     to,
-    "Hôtel.ci — Mise à jour de votre demande de réservation",
+    "Résidences Chanaude — Mise à jour de votre demande de réservation",
     templateReservationRefused(firstName, lastName)
   );
 }
@@ -100,7 +100,7 @@ export async function sendAdminNewReservation(
   }
   return sendMail(
     adminEmail,
-    `Hôtel.ci Admin — Nouvelle  Démande deréservation de ${firstName} ${lastName}`,
+    `Résidences Chanaude Admin — Nouvelle demande de réservation de ${firstName} ${lastName}`,
     templateAdminNewReservation(firstName, lastName, email, phone)
   );
 }

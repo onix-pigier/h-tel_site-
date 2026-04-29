@@ -27,24 +27,24 @@ export const Hero = ({ onReserve }: HeroProps) => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass shadow-soft">
               <Sparkles className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium text-primary">Institut Hôtelier d'Excellence</span>
+              <span className="text-sm font-medium text-primary">Les Résidences Chanaude Mondoukou</span>
             </div>
 
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] text-primary">
               Vivez une <span className="gradient-text italic">expérience</span>{" "}
-              résidentielle d'exception.
+              résidentielle d&apos;exception.
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
               Réservez votre résidence dans un cadre raffiné, pensé pour les étudiants et professionnels
-              en quête d'élégance, de confort et de sérénité.
+              en quête d&apos;élégance, de confort et de sérénité.
             </p>
 
             <div className="flex flex-wrap gap-4 pt-2">
               <Button
                 onClick={onReserve}
                 size="lg"
-                className="gradient-teal text-accent-foreground hover:opacity-90 rounded-full px-8 h-14 text-base font-semibold shadow-elegant hover:scale-105 transition-all duration-300 group"
+                className="gradient-sunset text-accent-foreground hover:opacity-90 rounded-full px-8 h-14 text-base font-semibold shadow-elegant hover:scale-105 transition-all duration-300 group"
               >
                 <Calendar className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
                 Réserver maintenant
@@ -72,7 +72,7 @@ export const Hero = ({ onReserve }: HeroProps) => {
             </div>
           </motion.div>
 
-          {/* Bento grid */}
+          {/* Bento grid — different photos from Residences section */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -84,11 +84,11 @@ export const Hero = ({ onReserve }: HeroProps) => {
               transition={{ duration: 0.3 }}
               className="col-span-4 row-span-4 rounded-3xl overflow-hidden shadow-elegant relative group"
             >
-              <Image src="/assets/residence-1.jpg" alt="Résidence vue océan" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="/assets/residence-9.jpg" alt="Entrée résidence Chanaude" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 50vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
               <div className="absolute bottom-5 left-5 text-primary-foreground">
-                <div className="text-xs uppercase tracking-widest opacity-80">Signature</div>
-                <div className="font-display text-xl font-semibold">Résidence Océane</div>
+                <div className="text-xs uppercase tracking-widest opacity-80">Bienvenue</div>
+                <div className="font-display text-xl font-semibold">Résidences Chanaude</div>
               </div>
             </motion.div>
 
@@ -96,29 +96,29 @@ export const Hero = ({ onReserve }: HeroProps) => {
               whileHover={{ scale: 1.02 }}
               className="col-span-2 row-span-3 rounded-3xl overflow-hidden shadow-elegant relative group animate-float"
             >
-              <Image src="/assets/residence-3.jpg" alt="Lounge intérieur" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 25vw" />
+              <Image src="/assets/residence-6.jpg" alt="Salon intérieur" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 25vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent" />
-              <div className="absolute bottom-3 left-3 text-primary-foreground text-sm font-medium">Lounge</div>
+              <div className="absolute bottom-3 left-3 text-primary-foreground text-sm font-medium">Salon</div>
             </motion.div>
 
             <motion.div
               whileHover={{ scale: 1.02 }}
               className="col-span-2 row-span-3 rounded-3xl overflow-hidden shadow-elegant relative group"
             >
-              <Image src="/assets/residence-2.jpg" alt="Chambre lumineuse" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 25vw" />
+              <Image src="/assets/residence-10.jpg" alt="Chambre confort" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 25vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-accent/50 to-transparent" />
-              <div className="absolute bottom-3 left-3 text-white text-sm font-medium">Suite Premium</div>
+              <div className="absolute bottom-3 left-3 text-white text-sm font-medium">Chambre Premium</div>
             </motion.div>
 
             <motion.div
               whileHover={{ scale: 1.02 }}
               className="col-span-4 row-span-2 rounded-3xl overflow-hidden shadow-elegant relative group"
             >
-              <Image src="/assets/residence-4.jpg" alt="Piscine extérieure" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="/assets/residence-8.jpg" alt="Extérieur résidence" fill className="object-cover group-hover:scale-110 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 50vw" />
               <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/20 to-transparent" />
               <div className="absolute top-1/2 -translate-y-1/2 left-5 text-primary-foreground">
-                <div className="text-xs uppercase tracking-widest opacity-80">Détente</div>
-                <div className="font-display text-lg font-semibold">Piscine & Spa</div>
+                <div className="text-xs uppercase tracking-widest opacity-80">Cadre</div>
+                <div className="font-display text-lg font-semibold">Extérieur & Allées</div>
               </div>
             </motion.div>
           </motion.div>

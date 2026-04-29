@@ -19,10 +19,86 @@ enum ChambreStatus {
   maintenance
 }
 
+enum ChambreCategory {
+  standard
+  villa_1ch
+  villa_2ch
+}
+
+enum ReservationSource {
+  web
+  presence
+}
+
 enum ReservationStatus {
   en_attente
+  validee
+  convertie
   acceptee
   refusee
+  annulee
+}
+
+enum DocumentType {
+  cni
+  passport
+  titre_sejour
+  autre
+}
+
+enum StayOffer {
+  nuitee
+  forfait
+  passage
+  villa_1ch
+  villa_2ch
+  longue_duree
+  personnalise
+}
+
+enum DiscountType {
+  none
+  percent
+  fixed
+}
+
+enum StayStatus {
+  planifie
+  en_cours
+  termine
+  annule
+}
+
+enum PaymentArrangement {
+  immediat
+  avance_partielle
+  fin_sejour
+}
+
+enum PaymentStatus {
+  solde
+  avance_versee
+  en_attente_paiement
+  solde_en_cours
+}
+
+enum PaymentType {
+  acompte
+  partiel
+  solde
+}
+
+enum PaymentMethod {
+  especes
+  mobile_money
+  carte
+  virement
+  autre
+}
+
+enum NoteMoment {
+  avant
+  apres
 }
 
 model User {
@@ -50,34 +126,70 @@ model UserRole {
 }
 
 model Chambre {
-  id           String         @id @default(uuid())
-  numero       String         @unique
+  id           String          @id @default(uuid())
+  numero       String          @unique
   type         String
-  prix         Decimal        @default(0) @db.Decimal(10, 2)
-  capacite     Int            @default(1)
-  description  String?        @db.Text
-  status       ChambreStatus  @default(disponible)
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
+  categorie    ChambreCategory @default(standard)
+  prix         Decimal         @default(0) @db.Decimal(10, 2)
+  capacite     Int             @default(1)
+  description  String?         @db.Text
+  status       ChambreStatus   @default(disponible)
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
   attributions Attribution[]
+  sejours      Sejour[]
 
   @@map("chambres")
 }
 
-model Reservation {
-  id           String            @id @default(uuid())
-  firstName    String            @map("first_name")
-  lastName     String            @map("last_name")
-  email        String
-  phone        String
-  dateArrivee  DateTime?         @map("date_arrivee") @db.Date
-  dateDepart   DateTime?         @map("date_depart") @db.Date
-  notes        String?           @db.Text
-  status       ReservationStatus @default(en_attente)
-  createdAt    DateTime          @default(now()) @map("created_at")
-  updatedAt    DateTime          @updatedAt @map("updated_at")
-  attribution  Attribution?
+model Client {
+  id             String        @id @default(uuid())
+  firstName      String        @map("first_name")
+  lastName       String        @map("last_name")
+  email          String?
+  phone          String
+  documentNumber String?       @map("document_number")
+  documentType   DocumentType? @map("document_type")
+  birthDate      DateTime?     @map("birth_date") @db.Date
+  age            Int?
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  reservations   Reservation[]
+  sejours        Sejour[]
+  notes          ClientNote[]
 
+  @@index([email])
+  @@index([phone])
+  @@index([documentNumber])
+  @@map("clients")
+}
+
+model Reservation {
+  id               String            @id @default(uuid())
+  reference        String?           @unique @default(cuid())
+  clientId         String?           @map("client_id")
+  source           ReservationSource @default(web)
+  firstName        String            @map("first_name")
+  lastName         String            @map("last_name")
+  email            String
+  phone            String
+  documentNumber   String?           @map("document_number")
+  documentType     DocumentType?     @map("document_type")
+  birthDate        DateTime?         @map("birth_date") @db.Date
+  age              Int?
+  dateArrivee      DateTime?         @map("date_arrivee") @db.Date
+  dateDepart       DateTime?         @map("date_depart") @db.Date
+  offer            StayOffer?        @map("offer")
+  customOfferLabel String?           @map("custom_offer_label")
+  notes            String?           @db.Text
+  status           ReservationStatus @default(en_attente)
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  attribution      Attribution?
+  client           Client?           @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  sejour           Sejour?
+
+  @@index([status, dateArrivee, dateDepart])
   @@map("reservations")
 }
 
@@ -92,4 +204,99 @@ model Attribution {
   chambre       Chambre     @relation(fields: [chambreId], references: [id], onDelete: Restrict)
 
   @@map("attributions")
+}
+
+model Sejour {
+  id                 String             @id @default(uuid())
+  code               String             @unique @default(cuid())
+  clientId           String             @map("client_id")
+  chambreId          String             @map("chambre_id")
+  reservationId      String?            @unique @map("reservation_id")
+  source             ReservationSource  @default(presence)
+  status             StayStatus         @default(en_cours)
+  offer              StayOffer          @map("offer")
+  customOfferLabel   String?            @map("custom_offer_label")
+  startedAt          DateTime           @map("started_at")
+  endedAt            DateTime           @map("ended_at")
+  currentEndAt       DateTime           @map("current_end_at")
+  baseAmount         Decimal            @default(0) @map("base_amount") @db.Decimal(10, 2)
+  discountType       DiscountType       @default(none) @map("discount_type")
+  discountValue      Decimal            @default(0) @map("discount_value") @db.Decimal(10, 2)
+  discountAmount     Decimal            @default(0) @map("discount_amount") @db.Decimal(10, 2)
+  netAmount          Decimal            @default(0) @map("net_amount") @db.Decimal(10, 2)
+  amountPaid         Decimal            @default(0) @map("amount_paid") @db.Decimal(10, 2)
+  balanceDue         Decimal            @default(0) @map("balance_due") @db.Decimal(10, 2)
+  paymentArrangement PaymentArrangement @default(fin_sejour) @map("payment_arrangement")
+  paymentStatus      PaymentStatus      @default(en_attente_paiement) @map("payment_status")
+  notes              String?            @db.Text
+  checkedInAt        DateTime?          @map("checked_in_at")
+  checkedOutAt       DateTime?          @map("checked_out_at")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+  client             Client             @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  chambre            Chambre            @relation(fields: [chambreId], references: [id], onDelete: Restrict)
+  reservation        Reservation?       @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  extensions         StayExtension[]
+  payments           Payment[]
+  clientNotes        ClientNote[]
+
+  @@index([chambreId, status, startedAt, currentEndAt])
+  @@index([clientId, status])
+  @@map("sejours")
+}
+
+model StayExtension {
+  id               String        @id @default(uuid())
+  stayId           String        @map("stay_id")
+  startedAt        DateTime      @map("started_at")
+  endedAt          DateTime      @map("ended_at")
+  offer            StayOffer     @map("offer")
+  customOfferLabel String?       @map("custom_offer_label")
+  baseAmount       Decimal       @default(0) @map("base_amount") @db.Decimal(10, 2)
+  discountType     DiscountType  @default(none) @map("discount_type")
+  discountValue    Decimal       @default(0) @map("discount_value") @db.Decimal(10, 2)
+  discountAmount   Decimal       @default(0) @map("discount_amount") @db.Decimal(10, 2)
+  netAmount        Decimal       @default(0) @map("net_amount") @db.Decimal(10, 2)
+  amountPaid       Decimal       @default(0) @map("amount_paid") @db.Decimal(10, 2)
+  balanceDue       Decimal       @default(0) @map("balance_due") @db.Decimal(10, 2)
+  paymentStatus    PaymentStatus @default(en_attente_paiement) @map("payment_status")
+  notes            String?       @db.Text
+  createdAt        DateTime      @default(now()) @map("created_at")
+  stay             Sejour        @relation(fields: [stayId], references: [id], onDelete: Cascade)
+  payments         Payment[]
+
+  @@index([stayId, startedAt, endedAt])
+  @@map("sejour_extensions")
+}
+
+model Payment {
+  id          String         @id @default(uuid())
+  stayId      String         @map("stay_id")
+  extensionId String?        @map("extension_id")
+  paidAt      DateTime       @map("paid_at")
+  amount      Decimal        @default(0) @db.Decimal(10, 2)
+  method      PaymentMethod
+  type        PaymentType
+  notes       String?        @db.Text
+  createdAt   DateTime       @default(now()) @map("created_at")
+  stay        Sejour         @relation(fields: [stayId], references: [id], onDelete: Cascade)
+  extension   StayExtension? @relation(fields: [extensionId], references: [id], onDelete: SetNull)
+
+  @@index([stayId, paidAt])
+  @@map("payments")
+}
+
+model ClientNote {
+  id        String      @id @default(uuid())
+  clientId  String      @map("client_id")
+  stayId    String?     @map("stay_id")
+  moment    NoteMoment
+  rating    Int?
+  comment   String?     @db.Text
+  createdAt DateTime    @default(now()) @map("created_at")
+  client    Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  stay      Sejour?     @relation(fields: [stayId], references: [id], onDelete: SetNull)
+
+  @@index([clientId, moment])
+  @@map("client_notes")
 }

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXTAUTH_URL || "https://Hôtel.ci";
+  const baseUrl = process.env.NEXTAUTH_URL || "https://chanaude.ci";
 
   return [
     {

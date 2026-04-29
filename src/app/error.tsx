@@ -10,7 +10,7 @@ export default function GlobalError({
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
       <div className="max-w-md text-center space-y-4">
-        <div className="w-16 h-16 mx-auto rounded-2xl gradient-teal flex items-center justify-center shadow-soft">
+        <div className="w-16 h-16 mx-auto rounded-2xl gradient-sunset flex items-center justify-center shadow-soft">
           <span className="font-display text-2xl font-bold text-accent-foreground">!</span>
         </div>
         <h2 className="text-2xl font-display font-bold text-primary">
@@ -21,7 +21,7 @@ export default function GlobalError({
         </p>
         <button
           onClick={reset}
-          className="inline-flex items-center px-6 py-3 rounded-2xl gradient-teal text-accent-foreground font-semibold shadow-elegant hover:opacity-90 transition-opacity"
+          className="inline-flex items-center px-6 py-3 rounded-2xl gradient-sunset text-accent-foreground font-semibold shadow-elegant hover:opacity-90 transition-opacity"
         >
           Réessayer
         </button>

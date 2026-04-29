@@ -4,11 +4,11 @@ import Image from "next/image";
 
 
 const residences = [
-  { img: "/assets/residence-1.jpg", name: "Résidence Océane", location: "Front de mer", capacity: "120 chambres", tag: "Signature" },
-  { img: "/assets/residence-2.jpg", name: "Suite Lumière", location: "Centre-ville", capacity: "Vue panoramique", tag: "Premium" },
-  { img: "/assets/residence-5.jpg", name: "Studio Étudiant", location: "Quartier campus", capacity: "Bureau intégré", tag: "Étudiant" },
-  { img: "/assets/residence-3.jpg", name: "Lounge Privatif", location: "Aile sud", capacity: "Espace partagé", tag: "Lifestyle" },
-  { img: "/assets/residence-4.jpg", name: "Villa Piscine", location: "Jardins privés", capacity: "Spa & détente", tag: "Premium" },
+  { img: "/assets/residence-1.png", name: "Résidence Océane", location: "Front de mer", capacity: "120 chambres", tag: "Signature" },
+  { img: "/assets/residence-2.png", name: "Suite Lumière", location: "Centre-ville", capacity: "Vue panoramique", tag: "Premium" },
+  { img: "/assets/residence-5.png", name: "Studio Étudiant", location: "Quartier campus", capacity: "Bureau intégré", tag: "Étudiant" },
+  { img: "/assets/residence-3.png", name: "Lounge Privatif", location: "Aile sud", capacity: "Espace partagé", tag: "Lifestyle" },
+  { img: "/assets/residence-4.png", name: "Villa Piscine", location: "Jardins privés", capacity: "Spa & détente", tag: "Premium" },
 ];
 
 export const Residences = () => {

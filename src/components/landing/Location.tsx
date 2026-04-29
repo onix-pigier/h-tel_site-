@@ -25,7 +25,7 @@ export const Location = () => {
 
             <div className="space-y-4">
               <div className="flex items-start gap-4 p-4 rounded-2xl bg-card border border-border/60">
-                <div className="w-10 h-10 rounded-xl gradient-teal flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl gradient-sunset flex items-center justify-center flex-shrink-0">
                   <MapPin className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -34,7 +34,7 @@ export const Location = () => {
                 </div>
               </div>
               <div className="flex items-start gap-4 p-4 rounded-2xl bg-card border border-border/60">
-                <div className="w-10 h-10 rounded-xl gradient-teal flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl gradient-sunset flex items-center justify-center flex-shrink-0">
                   <Phone className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -43,12 +43,12 @@ export const Location = () => {
                 </div>
               </div>
               <div className="flex items-start gap-4 p-4 rounded-2xl bg-card border border-border/60">
-                <div className="w-10 h-10 rounded-xl gradient-teal flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl gradient-sunset flex items-center justify-center flex-shrink-0">
                   <Mail className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <div className="font-semibold text-primary">Email</div>
-                  <div className="text-sm text-muted-foreground">contact@hotel.ci</div>
+                  <div className="text-sm text-muted-foreground">contact@chanaude.ci</div>
                 </div>
               </div>
             </div>
@@ -61,17 +61,17 @@ export const Location = () => {
             className="relative rounded-3xl overflow-hidden shadow-elegant h-[500px] bg-muted"
           >
             <iframe
-              title="Localisation Hotelis"
+              title="Localisation Residences Chanaude"
               src="https://www.openstreetmap.org/export/embed.html?bbox=-4.08%2C5.30%2C-3.95%2C5.38&layer=mapnik&marker=5.3364%2C-4.0267"
               className="w-full h-full border-0"
               loading="lazy"
             />
             <div className="absolute top-5 left-5 glass rounded-2xl px-4 py-3 shadow-soft flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-teal flex items-center justify-center animate-glow-pulse">
+              <div className="w-10 h-10 rounded-xl gradient-sunset flex items-center justify-center animate-glow-pulse">
                 <Navigation className="w-5 h-5 text-white" />
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Hoteli.ci</div>
+                <div className="text-xs text-muted-foreground">Chanaude</div>
                 <div className="font-semibold text-primary text-sm">Abidjan, Côte d’Ivoire</div>
               </div>
             </div>

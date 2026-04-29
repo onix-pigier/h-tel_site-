@@ -8,6 +8,9 @@ on:
 
 env:
   NODE_VERSION: "20"
+  DATABASE_URL: "mysql://ci:ci@127.0.0.1:3306/hotel_ci"
+  NEXTAUTH_SECRET: "ci-build-placeholder-secret"
+  NEXTAUTH_URL: "http://localhost:3000"
 
 jobs:
   ci:
@@ -30,12 +33,11 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
-      - name: Type-check
-        run: npx tsc --noEmit
+      - name: Lint
+        run: npm run lint
 
       - name: Build
         run: npm run build
-        env:
-          DATABASE_URL: "mysql://root:pigierCIV01@localhost:3306/hotels_db"
-          NEXTAUTH_SECRET: "ci-test-secret"
-          NEXTAUTH_URL: "http://localhost:3000"
+
+      - name: Type-check
+        run: npx tsc --noEmit

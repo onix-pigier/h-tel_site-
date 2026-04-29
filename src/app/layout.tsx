@@ -2,46 +2,46 @@ import type { Metadata } from "next";
 import { Providers } from "./providers";
 import "./globals.css";
 
-const baseUrl = process.env.NEXTAUTH_URL || "https://Hôtel.ci";
+const baseUrl = process.env.NEXTAUTH_URL || "https://chanaude.ci";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Hôtel.ci — Institut Hôtelier d'Excellence | Résidences Premium",
-    template: "%s | Hôtel.ci",
+    default: "Résidences Chanaude Mondoukou — Résidences Premium à Abidjan",
+    template: "%s | Résidences Chanaude",
   },
   description:
-    "Réservez votre résidence hôtelière premium chez Hôtel.ci. Cadre raffiné, services inclus, idéalement situé. Pour étudiants et professionnels en Côte d'Ivoire.",
+    "Réservez votre résidence premium aux Résidences Chanaude Mondoukou. Cadre raffiné, services inclus, idéalement situé à Abidjan, Côte d'Ivoire.",
   keywords: [
-    "hôtel",
+    "résidences chanaude",
+    "chanaude mondoukou",
     "résidence",
     "réservation",
-    "Hôtel.ci",
     "Côte d'Ivoire",
     "Abidjan",
     "hébergement",
-    "institut hôtelier",
     "chambre",
-    "logement étudiant",
+    "logement",
+    "hôtel",
   ],
-  authors: [{ name: "Hôtel.ci" }],
-  creator: "Hôtel.ci",
+  authors: [{ name: "Résidences Chanaude" }],
+  creator: "Résidences Chanaude Mondoukou",
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Hôtel.ci — Institut Hôtelier d'Excellence",
+    title: "Résidences Chanaude Mondoukou — Résidences Premium",
     description:
       "Vivez une expérience résidentielle d'exception. Résidences premium, services inclus, au cœur d'Abidjan.",
     type: "website",
     locale: "fr_CI",
     url: baseUrl,
-    siteName: "Hôtel.ci",
+    siteName: "Résidences Chanaude",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Hôtel.ci — Résidences Premium",
+    title: "Résidences Chanaude Mondoukou",
     description:
-      "Réservez votre résidence hôtelière premium chez Hôtel.ci. Services inclus, cadre raffiné.",
+      "Réservez votre résidence premium aux Résidences Chanaude Mondoukou. Services inclus, cadre raffiné.",
   },
 };
 
@@ -49,14 +49,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Hotel",
-    name: "Hôtel.ci",
+    name: "Les Résidences Chanaude Mondoukou",
     description:
-      "Institut Hôtelier d'Excellence — Résidences premium pour étudiants et professionnels en Côte d'Ivoire.",
+      "Résidences premium pour étudiants et professionnels à Mondoukou, Abidjan, Côte d'Ivoire.",
     url: baseUrl,
     address: {
       "@type": "PostalAddress",
       addressCountry: "CI",
       addressLocality: "Abidjan",
+      addressRegion: "Mondoukou",
     },
     priceRange: "25000 - 85000 FCFA",
     starRating: { "@type": "Rating", ratingValue: "4" },
@@ -65,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#0f1e33" />
+        <meta name="theme-color" content="#e86e24" />
         <link rel="canonical" href={baseUrl} />
         <script
           type="application/ld+json"

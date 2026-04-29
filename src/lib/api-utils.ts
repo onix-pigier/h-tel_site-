@@ -25,12 +25,12 @@ function errorResponse(status: number, message: string, details?: unknown) {
 
 // ─── Route Handler Wrapper ───────────────────────────────────
 
-type RouteHandler = (req: Request) => Promise<NextResponse>;
+type RouteHandler = (req: Request, context?: any) => Promise<NextResponse>;
 
 export function withErrorHandler(handler: RouteHandler): RouteHandler {
-  return async (req: Request) => {
+  return async (req: Request, context?: any) => {
     try {
-      return await handler(req);
+      return await handler(req, context);
     } catch (error) {
       // Known API errors
       if (error instanceof ApiError) {

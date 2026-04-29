@@ -1,4 +1,4 @@
-# 🏨 Hotel.ci — Institut Hôtelier d'Excellence
+# 🏨 Résidences Chanaude — Gestion hôtelière
 
 > Plateforme SaaS moderne de gestion hôtelière avec landing page client et panneau d'administration complet.
 
@@ -6,7 +6,7 @@
 
 ## 📋 Vue d'ensemble
 
-**Hôtel.ci** est une plateforme web complète pour un institut hôtelier, composée de :
+**Résidences Chanaude** est une plateforme web complète de gestion hôtelière, composée de :
 
 - **Un site vitrine public** — présentation premium de l'institut, des services et résidences, avec formulaire de réservation en ligne
 - **Un panneau d'administration protégé** — gestion des réservations, chambres et attributions avec notifications automatisées (email + SMS)
@@ -142,8 +142,8 @@ hotel/
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/votre-repo/Hôtel.ci.git
-cd Hôtel.ci
+git clone https://github.com/votre-repo/residence-chanaude.git
+cd residence-chanaude
 ```
 
 ### 2. Installer les dépendances
@@ -158,16 +158,16 @@ Copier et adapter `.env` :
 
 ```env
 # Base de données
-DATABASE_URL="mysql://root:pigierCIV01@localhost:3306/hotels_db"
+DATABASE_URL="mysql://user:password@localhost:3306/hotels_db"
 
 # NextAuth
 NEXTAUTH_SECRET="your-super-secret-key"
 NEXTAUTH_URL="http://localhost:3000"
 
 # Admins (seed)
-SEED_ADMIN1_EMAIL="onix@Hôtel.ci"
+SEED_ADMIN1_EMAIL="onix@chanaude.ci"
 SEED_ADMIN1_PASSWORD="Admin123!"
-SEED_ADMIN2_EMAIL="admin@Hôtel.ci"
+SEED_ADMIN2_EMAIL="admin@chanaude.ci"
 SEED_ADMIN2_PASSWORD="Admin123!"
 
 # Email (SMTP)
@@ -175,8 +175,8 @@ SMTP_HOST="smtp.gmail.com"
 SMTP_PORT=587
 SMTP_USER="your-email@gmail.com"
 SMTP_PASS="your-app-password"
-SMTP_FROM="Hôtel.ci <noreply@Hôtel.ci>"
-ADMIN_EMAIL="admin@Hôtel.ci"
+SMTP_FROM="Résidences Chanaude <noreply@chanaude.ci>"
+ADMIN_EMAIL="admin@chanaude.ci"
 
 # SMS (optionnel)
 SMS_PROVIDER=""
@@ -260,7 +260,7 @@ L'application est accessible sur **http://localhost:3000**.
 
 ```bash
 npm run build
-pm2 start npm --name "Hôtel.ci" -- start
+pm2 start npm --name "residence-chanaude" -- start
 ```
 
 ---
@@ -280,4 +280,4 @@ Déclenché sur push `main`/`develop` et pull requests.
 
 ## 📄 Licence
 
-Projet privé — © Hôtel.ci. Tous droits réservés.
+Projet privé — © Résidences Chanaude. Tous droits réservés.

@@ -28,9 +28,9 @@ export const About = () => {
             Notre mission : <span className="gradient-text italic">redéfinir</span> la résidence hôtelière.
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Depuis plus d'une décennie, l'Institut Hôtel.ci forme et héberge les talents de demain.
-            Nous combinons l'élégance d'un hôtel cinq étoiles avec la chaleur d'un foyer pensé pour
-            l'apprentissage et le bien-être.
+            Depuis plus d&apos;une décennie, les Résidences Chanaude accueillent et hébergent les talents de demain.
+            Nous combinons l&apos;élégance d&apos;un hôtel cinq étoiles avec la chaleur d&apos;un foyer pensé pour
+            l&apos;apprentissage et le bien-être.
           </p>
         </motion.div>
 
@@ -44,7 +44,7 @@ export const About = () => {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="group p-7 rounded-3xl bg-card border border-border/60 hover:border-accent/40 hover:shadow-elegant transition-all duration-500 hover:-translate-y-2"
             >
-              <div className="w-12 h-12 rounded-2xl gradient-teal flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-soft">
+              <div className="w-12 h-12 rounded-2xl gradient-sunset flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-soft">
                 <v.icon className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-display text-xl font-semibold text-primary mb-2">{v.title}</h3>

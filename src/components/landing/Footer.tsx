@@ -1,5 +1,6 @@
 import { Instagram, Twitter, Facebook, Linkedin, Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface FooterProps {
   onReserve: () => void;
@@ -14,13 +15,13 @@ export const Footer = ({ onReserve }: FooterProps) => {
         {/* CTA */}
         <div className="text-center max-w-3xl mx-auto mb-20">
           <h2 className="font-display text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Prêt à rejoindre <span className="bg-gradient-to-r from-accent-glow to-white bg-clip-text text-transparent italic">Hôtel.ci</span> ?
+            Prêt à rejoindre <span className="bg-gradient-to-r from-accent-glow to-white bg-clip-text text-transparent italic">Chanaude</span> ?
           </h2>
           <p className="text-white/70 text-lg mb-8">Réservez votre résidence en quelques minutes.</p>
           <Button
             onClick={onReserve}
             size="lg"
-            className="rounded-full gradient-teal hover:opacity-90 px-10 h-14 text-base font-semibold shadow-glow animate-glow-pulse"
+            className="rounded-full gradient-sunset hover:opacity-90 px-10 h-14 text-base font-semibold shadow-glow animate-glow-pulse"
           >
             Réserver maintenant
           </Button>
@@ -29,13 +30,16 @@ export const Footer = ({ onReserve }: FooterProps) => {
         <div className="grid md:grid-cols-4 gap-10 pt-12 border-t border-white/10">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl gradient-teal flex items-center justify-center">
-                <span className="font-display font-bold text-white">H</span>
+              <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center">
+                <Image src="/assets/logo.png" alt="Résidences Chanaude" width={40} height={40} className="object-contain" />
               </div>
-              <span className="font-display font-bold text-xl">Hôtel.ci</span>
+              <div>
+                <span className="font-display font-bold text-xl block leading-tight">Chanaude</span>
+                <span className="text-white/50 text-xs">Mondoukou</span>
+              </div>
             </div>
             <p className="text-white/60 text-sm leading-relaxed">
-              Institut Hôtelier d'Excellence. Résidences premium pour étudiants et professionnels.
+              Les Résidences Chanaude Mondoukou. Résidences premium pour étudiants et professionnels.
             </p>
           </div>
 
@@ -52,14 +56,18 @@ export const Footer = ({ onReserve }: FooterProps) => {
           <div>
             <h4 className="font-display font-semibold mb-4">Contact</h4>
             <ul className="space-y-3 text-sm text-white/60">
-              <li className="flex items-start gap-2"><MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" /> Abidjan, Côte d’Ivoire</li>
+              <li className="flex items-start gap-2"><MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" /> Mondoukou, Abidjan, Côte d&apos;Ivoire</li>
               <li className="flex items-center gap-2"><Phone className="w-4 h-4" /> +225 0102030405</li>
-              <li className="flex items-center gap-2"><Mail className="w-4 h-4" /> contact@Hôtel.ci</li>
+              <li className="flex items-center gap-2"><Mail className="w-4 h-4" /> contact@chanaude.ci</li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-display font-semibold mb-4">Suivez-nous</h4>
+            <h4 className="font-display font-semibold mb-4">Scannez-nous</h4>
+            <div className="w-32 h-32 rounded-2xl overflow-hidden bg-white p-2 mb-4">
+              <Image src="/assets/qrcode.png" alt="QR Code Résidences Chanaude" width={112} height={112} className="object-contain" />
+            </div>
+            <h4 className="font-display font-semibold mb-3">Suivez-nous</h4>
             <div className="flex gap-3">
               {[Instagram, Twitter, Facebook, Linkedin].map((Icon, i) => (
                 <a
@@ -76,7 +84,7 @@ export const Footer = ({ onReserve }: FooterProps) => {
         </div>
 
         <div className="pt-8 mt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/50">
-          <div>© {new Date().getFullYear()} Hôtel.ci Institut. Tous droits réservés.</div>
+          <div suppressHydrationWarning>© {new Date().getFullYear()} Les Résidences Chanaude Mondoukou. Tous droits réservés.</div>
           <div className="flex gap-6">
             <a href="#" className="hover:text-white">Mentions légales</a>
             <a href="#" className="hover:text-white">Confidentialité</a>

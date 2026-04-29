@@ -48,7 +48,7 @@ export const Services = () => {
             >
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-accent/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative">
-                <div className="w-12 h-12 rounded-2xl bg-primary/5 group-hover:gradient-teal flex items-center justify-center mb-4 transition-all duration-500">
+                <div className="w-12 h-12 rounded-2xl bg-primary/5 group-hover:gradient-sunset flex items-center justify-center mb-4 transition-all duration-500">
                   <s.icon className="w-5 h-5 text-primary group-hover:text-white transition-colors" />
                 </div>
                 <h3 className="font-display font-semibold text-primary mb-1.5">{s.title}</h3>

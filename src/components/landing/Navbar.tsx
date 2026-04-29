@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Lock, Menu, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -43,10 +44,10 @@ export const Navbar = ({ onReserve }: NavbarProps) => {
       >
         <div className="flex items-center justify-between gap-4">
           <button onClick={() => scrollTo("hero")} className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl gradient-teal flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform">
-              <span className="font-display font-bold text-white text-lg">H</span>
+            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-soft group-hover:scale-110 transition-transform bg-white/80 flex items-center justify-center">
+              <Image src="/assets/logo.png" alt="Résidences Chanaude" width={36} height={36} className="object-contain" />
             </div>
-            <span className="font-display font-bold text-primary hidden sm:block">Hôtel.ci</span>
+            <span className="font-display font-bold text-primary hidden sm:block">Chanaude</span>
           </button>
 
           <div className="hidden lg:flex items-center gap-1">
@@ -76,7 +77,7 @@ export const Navbar = ({ onReserve }: NavbarProps) => {
             <Button
               onClick={onReserve}
               size="sm"
-              className="rounded-full gradient-teal text-accent-foreground hover:opacity-90 px-5 shadow-soft"
+              className="rounded-full gradient-sunset text-accent-foreground hover:opacity-90 px-5 shadow-soft"
             >
               Réserver
             </Button>

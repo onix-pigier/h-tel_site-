@@ -9,7 +9,15 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { useState } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 0,
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+      },
+    },
+  }));
 
   return (
     <SessionProvider>
