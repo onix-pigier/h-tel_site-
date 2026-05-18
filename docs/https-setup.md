@@ -18,7 +18,7 @@ sudo apt install -y certbot python3-certbot-nginx
 
 ## 2. Configuration Nginx (reverse proxy)
 
-Créer `/etc/nginx/sites-available/Hôtel.ci` :
+Créer `/etc/nginx/sites-available/Hôtel.ci` :.
 
 ```nginx
 server {

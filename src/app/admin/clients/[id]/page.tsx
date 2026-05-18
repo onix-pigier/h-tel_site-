@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import {
+  clientGenderLabels,
   documentTypeLabels,
   formatCurrency,
   offerLabels,
@@ -21,6 +22,14 @@ import { toNumber } from "@/lib/stay-utils";
 type PageProps = {
   params: Promise<{ id: string }>;
 };
+
+function getAgeFromBirthDate(birthDate: Date) {
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDelta = today.getMonth() - birthDate.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < birthDate.getDate())) age -= 1;
+  return Math.max(0, age);
+}
 
 function getStayTotals(stay: any) {
   const extensionNet = stay.extensions.reduce((sum: number, extension: any) => sum + toNumber(extension.netAmount), 0);
@@ -76,8 +85,7 @@ export default async function ClientDetailPage({ params }: PageProps) {
           <Button asChild variant="outline" size="sm">
             <Link href="/admin/registre"><ArrowLeft className="mr-2 h-4 w-4" /> Retour registre</Link>
           </Button>
-          <h1 className="mt-3 font-display text-2xl font-bold text-primary">{client.firstName} {client.lastName}</h1>
-          <p className="text-sm text-muted-foreground">Historique client consolidé, séjours, paiements, extensions et comportement</p>
+          <h1 className="mt-3 text-2xl font-bold text-primary">{client.firstName} {client.lastName}</h1>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="outline">{totalVisits} séjour(s)</Badge>
@@ -95,8 +103,15 @@ export default async function ClientDetailPage({ params }: PageProps) {
               Pièce: {client.documentNumber || "-"}
               {client.documentType ? " • " + (documentTypeLabels[client.documentType] ?? client.documentType) : ""}
             </div>
-            {client.birthDate ? <div>Naissance: {format(new Date(client.birthDate), "dd/MM/yyyy")}</div> : null}
-            {client.age ? <div>Âge: {client.age} ans</div> : null}
+            <div>
+              {client.nationality || "Nationalité non renseignée"}
+              {client.gender ? " • " + (clientGenderLabels[client.gender] ?? client.gender) : ""}
+            </div>
+            {client.birthDate ? (
+              <div>
+                Naissance: {format(new Date(client.birthDate), "dd/MM/yyyy")} • {getAgeFromBirthDate(new Date(client.birthDate))} ans
+              </div>
+            ) : null}
           </div>
         </Card>
         <Card className="p-5">
@@ -136,12 +151,12 @@ export default async function ClientDetailPage({ params }: PageProps) {
                   <div className="flex flex-wrap gap-2">
                     {latestPaymentId ? (
                       <Button size="sm" variant="outline" asChild>
-                        <Link href={"/admin/registre/" + stay.id + "/recu?paymentId=" + latestPaymentId} target="_blank"><Receipt className="mr-1 h-4 w-4" /> Reçu acompte</Link>
+                        <Link href={"/admin/registre/" + stay.id + "/facture?paymentId=" + latestPaymentId} target="_blank"><Receipt className="mr-1 h-4 w-4" /> Facture acompte</Link>
                       </Button>
                     ) : null}
                     {totals.totalBalance <= 0 ? (
                       <Button size="sm" variant="outline" asChild>
-                        <Link href={"/admin/registre/" + stay.id + "/recu"} target="_blank"><Printer className="mr-1 h-4 w-4" /> Reçu final</Link>
+                        <Link href={"/admin/registre/" + stay.id + "/facture"} target="_blank"><Printer className="mr-1 h-4 w-4" /> Facture finale</Link>
                       </Button>
                     ) : null}
                   </div>
@@ -150,7 +165,7 @@ export default async function ClientDetailPage({ params }: PageProps) {
                 <div className="grid gap-3 md:grid-cols-3 text-sm">
                   <div className="rounded-lg bg-muted/40 p-3">Total net: <span className="font-medium">{formatCurrency(totals.totalNet)}</span></div>
                   <div className="rounded-lg bg-muted/40 p-3">Payé: <span className="font-medium">{formatCurrency(totals.totalPaid)}</span></div>
-                  <div className="rounded-lg bg-muted/40 p-3">Reste: <span className="font-medium">{formatCurrency(totals.totalBalance)}</span></div>
+                  <div className="rounded-lg bg-muted/40 p-3">Reste à payer: <span className="font-medium">{formatCurrency(totals.totalBalance)}</span></div>
                 </div>
 
                 {stay.extensions.length > 0 ? (
@@ -160,7 +175,7 @@ export default async function ClientDetailPage({ params }: PageProps) {
                       <div key={extension.id} className="rounded-lg border p-3">
                         <div>{offerLabels[extension.offer] ?? extension.offer}</div>
                         <div className="text-muted-foreground">Du {format(new Date(extension.startedAt), "dd/MM/yyyy HH:mm")} au {format(new Date(extension.endedAt), "dd/MM/yyyy HH:mm")}</div>
-                        <div>Net {formatCurrency(extension.netAmount)} • Payé {formatCurrency(extension.amountPaid)} • Reste {formatCurrency(extension.balanceDue)}</div>
+                        <div>Net {formatCurrency(extension.netAmount)}  Payé {formatCurrency(extension.amountPaid)}  Reste {formatCurrency(extension.balanceDue)}</div>
                       </div>
                     ))}
                   </div>
@@ -173,7 +188,7 @@ export default async function ClientDetailPage({ params }: PageProps) {
                       <div className="grid grid-cols-[1fr_1fr_1fr_1.4fr] gap-3 border-b px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         <div>Date</div>
                         <div>Type</div>
-                        <div>Méthode</div>
+                        <div>Mode</div>
                         <div className="text-right">Montant</div>
                       </div>
                       {[...stay.payments, ...stay.extensions.flatMap((extension: any) => extension.payments)]

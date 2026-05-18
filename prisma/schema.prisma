@@ -1,21 +1,21 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 enum AppRole {
   admin
-  manager
-  user
+  gerant
 }
 
 enum ChambreStatus {
   disponible
   occupee
+  attente_nettoyage
   maintenance
 }
 
@@ -30,13 +30,26 @@ enum ReservationSource {
   presence
 }
 
+enum WorkflowKind {
+  web
+  direct
+  comptoir
+  appel
+}
+
 enum ReservationStatus {
   en_attente
-  validee
+  confirmee
   convertie
-  acceptee
   refusee
   annulee
+  reportee
+}
+
+enum ClientGender {
+  homme
+  femme
+  autre
 }
 
 enum DocumentType {
@@ -48,7 +61,8 @@ enum DocumentType {
 
 enum StayOffer {
   nuitee
-  forfait
+  forfait_semaine
+  forfait_weekend
   passage
   villa_1ch
   villa_2ch
@@ -60,6 +74,13 @@ enum DiscountType {
   none
   percent
   fixed
+}
+
+enum DiscountRequestStatus {
+  en_attente
+  approuvee
+  refusee
+  annulee
 }
 
 enum StayStatus {
@@ -96,6 +117,18 @@ enum PaymentMethod {
   autre
 }
 
+enum DepositType {
+  caution_generale
+  caution_villa
+}
+
+enum DepositStatus {
+  en_attente
+  encaissee
+  restituee
+  conservee
+}
+
 enum NoteMoment {
   avant
   apres
@@ -107,9 +140,12 @@ model User {
   passwordHash String     @map("password_hash")
   firstName    String?    @map("first_name")
   lastName     String?    @map("last_name")
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
-  roles        UserRole[]
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  roles              UserRole[]
+  auditLogs          AuditLog[]
+  requestedDiscounts DiscountRequest[]   @relation("DiscountRequestedBy")
+  reviewedDiscounts  DiscountRequest[]   @relation("DiscountReviewedBy")
 
   @@map("users")
 }
@@ -136,7 +172,6 @@ model Chambre {
   status       ChambreStatus   @default(disponible)
   createdAt    DateTime        @default(now()) @map("created_at")
   updatedAt    DateTime        @updatedAt @map("updated_at")
-  attributions Attribution[]
   sejours      Sejour[]
 
   @@map("chambres")
@@ -148,10 +183,11 @@ model Client {
   lastName       String        @map("last_name")
   email          String?
   phone          String
+  nationality    String?
+  gender         ClientGender?
   documentNumber String?       @map("document_number")
   documentType   DocumentType? @map("document_type")
   birthDate      DateTime?     @map("birth_date") @db.Date
-  age            Int?
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @updatedAt @map("updated_at")
   reservations   Reservation[]
@@ -169,41 +205,32 @@ model Reservation {
   reference        String?           @unique @default(cuid())
   clientId         String?           @map("client_id")
   source           ReservationSource @default(web)
+  workflowKind     WorkflowKind      @default(web) @map("workflow_kind")
   firstName        String            @map("first_name")
   lastName         String            @map("last_name")
   email            String
   phone            String
-  documentNumber   String?           @map("document_number")
-  documentType     DocumentType?     @map("document_type")
-  birthDate        DateTime?         @map("birth_date") @db.Date
-  age              Int?
+  nationality      String?
+  gender           ClientGender?
+  guestCount       Int?              @map("guest_count")
   dateArrivee      DateTime?         @map("date_arrivee") @db.Date
   dateDepart       DateTime?         @map("date_depart") @db.Date
   offer            StayOffer?        @map("offer")
   customOfferLabel String?           @map("custom_offer_label")
-  notes            String?           @db.Text
-  status           ReservationStatus @default(en_attente)
-  createdAt        DateTime          @default(now()) @map("created_at")
-  updatedAt        DateTime          @updatedAt @map("updated_at")
-  attribution      Attribution?
-  client           Client?           @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  sejour           Sejour?
+  notes               String?           @db.Text
+  requestedAdvanceAmount Decimal?       @map("requested_advance_amount") @db.Decimal(12, 2)
+  requestedAdvanceNote   String?        @map("requested_advance_note") @db.Text
+  status              ReservationStatus @default(en_attente)
+  reportedAt          DateTime?         @map("reported_at")
+  dateArriveeOriginal DateTime?         @map("date_arrivee_original") @db.Date
+  dateDepartOriginal  DateTime?         @map("date_depart_original") @db.Date
+  createdAt           DateTime          @default(now()) @map("created_at")
+  updatedAt           DateTime          @updatedAt @map("updated_at")
+  client              Client?           @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  sejour              Sejour?
 
   @@index([status, dateArrivee, dateDepart])
   @@map("reservations")
-}
-
-model Attribution {
-  id            String      @id @default(uuid())
-  reservationId String      @unique @map("reservation_id")
-  chambreId     String      @map("chambre_id")
-  checkIn       DateTime?   @map("check_in") @db.Date
-  checkOut      DateTime?   @map("check_out") @db.Date
-  createdAt     DateTime    @default(now()) @map("created_at")
-  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
-  chambre       Chambre     @relation(fields: [chambreId], references: [id], onDelete: Restrict)
-
-  @@map("attributions")
 }
 
 model Sejour {
@@ -213,9 +240,15 @@ model Sejour {
   chambreId          String             @map("chambre_id")
   reservationId      String?            @unique @map("reservation_id")
   source             ReservationSource  @default(presence)
+  workflowKind       WorkflowKind       @default(direct) @map("workflow_kind")
   status             StayStatus         @default(en_cours)
   offer              StayOffer          @map("offer")
+  guestCount         Int?               @map("guest_count")
   customOfferLabel   String?            @map("custom_offer_label")
+  plannedStartAt         DateTime?          @map("planned_start_at")
+  plannedEndAt           DateTime?          @map("planned_end_at")
+  plannedStartAtOriginal DateTime?          @map("planned_start_at_original")
+  plannedEndAtOriginal   DateTime?          @map("planned_end_at_original")
   startedAt          DateTime           @map("started_at")
   endedAt            DateTime           @map("ended_at")
   currentEndAt       DateTime           @map("current_end_at")
@@ -239,6 +272,8 @@ model Sejour {
   extensions         StayExtension[]
   payments           Payment[]
   clientNotes        ClientNote[]
+  discountRequests   DiscountRequest[]
+  deposits           StayDeposit[]
 
   @@index([chambreId, status, startedAt, currentEndAt])
   @@index([clientId, status])
@@ -270,19 +305,23 @@ model StayExtension {
 }
 
 model Payment {
-  id          String         @id @default(uuid())
-  stayId      String         @map("stay_id")
-  extensionId String?        @map("extension_id")
-  paidAt      DateTime       @map("paid_at")
-  amount      Decimal        @default(0) @db.Decimal(10, 2)
-  method      PaymentMethod
-  type        PaymentType
-  notes       String?        @db.Text
-  createdAt   DateTime       @default(now()) @map("created_at")
-  stay        Sejour         @relation(fields: [stayId], references: [id], onDelete: Cascade)
-  extension   StayExtension? @relation(fields: [extensionId], references: [id], onDelete: SetNull)
+  id                   String         @id @default(uuid())
+  stayId               String         @map("stay_id")
+  extensionId          String?        @map("extension_id")
+  paidAt               DateTime       @map("paid_at")
+  amount               Decimal        @default(0) @db.Decimal(10, 2)
+  method               PaymentMethod
+  type                 PaymentType
+  operator             String?        @db.VarChar(80)
+  payerPhone           String?        @map("payer_phone") @db.VarChar(30)
+  transactionReference String?        @map("transaction_reference") @db.VarChar(120)
+  notes                String?        @db.Text
+  createdAt            DateTime       @default(now()) @map("created_at")
+  stay                 Sejour         @relation(fields: [stayId], references: [id], onDelete: Cascade)
+  extension            StayExtension? @relation(fields: [extensionId], references: [id], onDelete: SetNull)
 
   @@index([stayId, paidAt])
+  @@index([transactionReference])
   @@map("payments")
 }
 
@@ -299,4 +338,64 @@ model ClientNote {
 
   @@index([clientId, moment])
   @@map("client_notes")
+}
+
+model DiscountRequest {
+  id                   String                @id @default(uuid())
+  stayId               String                @map("stay_id")
+  requestedById        String                @map("requested_by_id")
+  reviewedById         String?               @map("reviewed_by_id")
+  status               DiscountRequestStatus @default(en_attente)
+  discountType         DiscountType          @map("discount_type")
+  discountValue        Decimal               @default(0) @map("discount_value") @db.Decimal(10, 2)
+  approvedDiscountType DiscountType?         @map("approved_discount_type")
+  approvedDiscountValue Decimal?             @map("approved_discount_value") @db.Decimal(10, 2)
+  reason               String                @db.Text
+  reviewNote           String?               @map("review_note") @db.Text
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime              @updatedAt @map("updated_at")
+  reviewedAt           DateTime?             @map("reviewed_at")
+  stay                 Sejour                @relation(fields: [stayId], references: [id], onDelete: Cascade)
+  requestedBy          User                  @relation("DiscountRequestedBy", fields: [requestedById], references: [id], onDelete: Restrict)
+  reviewedBy           User?                 @relation("DiscountReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([stayId, status])
+  @@index([requestedById, status])
+  @@map("discount_requests")
+}
+
+model StayDeposit {
+  id            String        @id @default(uuid())
+  stayId         String        @map("stay_id")
+  type           DepositType   @default(caution_generale)
+  status         DepositStatus @default(en_attente)
+  expectedAmount Decimal       @default(0) @map("expected_amount") @db.Decimal(10, 2)
+  heldAmount     Decimal       @default(0) @map("held_amount") @db.Decimal(10, 2)
+  returnedAmount Decimal       @default(0) @map("returned_amount") @db.Decimal(10, 2)
+  method         PaymentMethod?
+  notes          String?       @db.Text
+  heldAt         DateTime?     @map("held_at")
+  returnedAt     DateTime?     @map("returned_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  stay           Sejour        @relation(fields: [stayId], references: [id], onDelete: Cascade)
+
+  @@index([stayId, status])
+  @@map("stay_deposits")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  userName   String   @map("user_name")
+  action     String
+  targetType String   @map("target_type")
+  targetId   String   @map("target_id")
+  details    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([targetType, targetId])
+  @@map("audit_logs")
 }

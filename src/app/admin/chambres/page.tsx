@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { BedDouble, ChevronLeft, ChevronRight, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { BedDouble, Brush, ChevronLeft, ChevronRight, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { formatCurrency } from "@/lib/hotel-display";
 
-type Status = "disponible" | "occupee" | "maintenance";
+type Status = "disponible" | "occupee" | "attente_nettoyage" | "maintenance";
 type Category = "standard" | "villa_1ch" | "villa_2ch";
 
 interface Chambre {
@@ -29,6 +30,7 @@ interface Chambre {
 const statusBadge: Record<Status, string> = {
   disponible: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
   occupee: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+  attente_nettoyage: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
   maintenance: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
 };
 
@@ -105,12 +107,26 @@ export default function ChambresPage() {
     load();
   };
 
+  const markClean = async (id: string) => {
+    const res = await fetch("/api/admin/chambres", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status: "disponible" }),
+    });
+    const payload = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      toast.error(payload.error || "Impossible de remettre la chambre en disponible");
+      return;
+    }
+    toast.success("Chambre marquée propre");
+    load();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold text-primary">Chambres</h1>
-          <p className="text-sm text-muted-foreground">Catégories tarifaires et état d'occupation</p>
+          <h1 className="text-2xl font-bold text-primary">Chambres</h1>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -144,6 +160,7 @@ export default function ChambresPage() {
                     <SelectContent>
                       <SelectItem value="disponible">Disponible</SelectItem>
                       <SelectItem value="occupee">Occupée</SelectItem>
+                      <SelectItem value="attente_nettoyage">Attente nettoyage</SelectItem>
                       <SelectItem value="maintenance">Maintenance</SelectItem>
                     </SelectContent>
                   </Select>
@@ -167,19 +184,24 @@ export default function ChambresPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-display font-bold text-lg text-primary">N° {item.numero}</h3>
-                    <Badge className={statusBadge[item.status]}>{item.status}</Badge>
+                    <h3 className="font-bold text-lg text-primary">N° {item.numero}</h3>
+                    <Badge className={statusBadge[item.status]}>{item.status.replaceAll("_", " ")}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">{categoryLabel[item.categorie]} • {item.capacite} pers.</p>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-accent">{item.prix} FCFA</div>
+                  <div className="font-bold text-accent">{formatCurrency(item.prix)}</div>
                   <div className="text-xs text-muted-foreground">/ nuit</div>
                 </div>
               </div>
               {item.description && <p className="text-sm text-muted-foreground">{item.description}</p>}
               {item.sejours[0] && <p className="text-xs text-muted-foreground">Séjour actif: {item.sejours[0].code} • {item.sejours[0].paymentStatus}</p>}
               <div className="flex gap-2 pt-2 border-t">
+                {item.status === "attente_nettoyage" && (
+                  <Button size="sm" variant="outline" className="flex-1" onClick={() => markClean(item.id)}>
+                    <Brush className="mr-1 h-3.5 w-3.5" /> Marquer propre
+                  </Button>
+                )}
                 <Button size="sm" variant="outline" className="flex-1" onClick={() => {
                   setEditing(item);
                   setForm({

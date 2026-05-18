@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Résidences Chanaude design system — Orange & Blue premium palette */
+/* Résidences Les Chanaude design system — Orange & Blue premium palette */
 
 @layer base {
   :root {
@@ -144,7 +144,12 @@
     font-feature-settings: 'cv11', 'ss01';
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Space Grotesk', 'SF Pro Display', -apple-system, sans-serif;
     letter-spacing: -0.02em;
   }
@@ -196,6 +201,7 @@
   .grain {
     position: relative;
   }
+
   .grain::after {
     content: '';
     position: absolute;
@@ -232,16 +238,49 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 30px hsl(24 90% 52% / 0.3); }
-  50% { box-shadow: 0 0 60px hsl(24 90% 52% / 0.55); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 30px hsl(24 90% 52% / 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 60px hsl(24 90% 52% / 0.55);
+  }
+}
+
+/* Ensure Radix Select/Popover renders above Dialog overlays */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
+
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.25s;
+  animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
 }

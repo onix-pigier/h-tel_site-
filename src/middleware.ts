@@ -9,7 +9,7 @@ export default withAuth({
       // Admin pages and API admin routes require staff role
       if (path.startsWith("/admin") || path.startsWith("/api/admin")) {
         const roles = (token?.roles as string[]) ?? [];
-        return roles.includes("admin") || roles.includes("manager");
+        return roles.includes("admin") || roles.includes("gerant");
       }
 
       return !!token;

@@ -18,16 +18,39 @@ export const GET = withErrorHandler(async (req: Request) => {
         { lastName: { contains: q } },
         { phone: { contains: q } },
         { email: { contains: q } },
+        { nationality: { contains: q } },
         { documentNumber: { contains: q } },
       ],
     },
     include: {
       sejours: {
-        include: {
+        select: {
+          id: true,
+          code: true,
+          source: true,
+          workflowKind: true,
+          status: true,
+          offer: true,
+          startedAt: true,
+          currentEndAt: true,
+          checkedInAt: true,
           chambre: { select: { numero: true } },
         },
         orderBy: { startedAt: "desc" },
+        take: 8,
+      },
+      notes: {
+        orderBy: { createdAt: "desc" },
         take: 5,
+        select: {
+          id: true,
+          moment: true,
+          comment: true,
+          createdAt: true,
+        },
+      },
+      _count: {
+        select: { sejours: true },
       },
     },
     take: 10,
@@ -37,7 +60,8 @@ export const GET = withErrorHandler(async (req: Request) => {
   return NextResponse.json({
     items: items.map((item) => ({
       ...item,
-      visitCount: item.sejours.length,
+      clientNotes: item.notes,
+      visitCount: item._count.sejours,
     })),
   });
 });

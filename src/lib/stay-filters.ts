@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 
 type StayFilterInput = {
   status?: string | null;
@@ -6,6 +6,7 @@ type StayFilterInput = {
   paymentStatus?: string | null;
   dateFrom?: string | null;
   dateTo?: string | null;
+  query?: string | null;
 };
 
 export function buildStayWhere(filters: StayFilterInput): Prisma.SejourWhereInput {
@@ -16,7 +17,7 @@ export function buildStayWhere(filters: StayFilterInput): Prisma.SejourWhereInpu
   }
 
   if (filters.source && filters.source !== "all") {
-    where.source = filters.source as never;
+    where.workflowKind = filters.source as never;
   }
 
   if (filters.paymentStatus && filters.paymentStatus !== "all") {
@@ -35,6 +36,21 @@ export function buildStayWhere(filters: StayFilterInput): Prisma.SejourWhereInpu
       end.setHours(23, 59, 59, 999);
       where.startedAt.lte = end;
     }
+  }
+
+  if (filters.query && filters.query.trim().length >= 2) {
+    const query = filters.query.trim();
+    where.OR = [
+      { code: { contains: query } },
+      { notes: { contains: query } },
+      { client: { is: { firstName: { contains: query } } } },
+      { client: { is: { lastName: { contains: query } } } },
+      { client: { is: { phone: { contains: query } } } },
+      { client: { is: { email: { contains: query } } } },
+      { client: { is: { documentNumber: { contains: query } } } },
+      { chambre: { is: { numero: { contains: query } } } },
+      { reservation: { is: { reference: { contains: query } } } },
+    ];
   }
 
   return where;

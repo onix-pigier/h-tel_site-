@@ -8,7 +8,7 @@ const faqs = [
   { q: "Quels documents fournir ?", a: "Une pièce d'identité, un justificatif d'inscription (étudiants) ou de revenus, et une caution." },
   { q: "Puis-je modifier ma réservation ?", a: "Oui, tant que la demande n'est pas convertie en séjour. Contactez l'institut pour faire ajuster les dates ou l'offre." },
   { q: "Les services sont-ils tous inclus ?", a: "Internet, ménage hebdomadaire et accès aux espaces communs sont inclus. La restauration est en option." },
-  { q: "Quelles sont les modalités de paiement ?", a: "Le règlement peut se faire à l'arrivée, en avance partielle ou à la fin du séjour selon validation du gérant. Le solde dû est suivi dans le registre de l'institut." },
+  { q: "Quelles sont les modalités de paiement ?", a: "Le règlement peut se faire à l'arrivée, en avance partielle ou à la fin du séjour selon l'organisation prévue avec la résidence. Le solde reste suivi dans le registre." },
   { q: "Puis-je visiter avant de réserver ?", a: "Bien sûr. Contactez-nous pour planifier une visite virtuelle ou sur place." },
 ];
 
