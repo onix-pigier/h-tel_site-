@@ -20,6 +20,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     paymentStatus: searchParams.get("paymentStatus"),
     dateFrom: searchParams.get("dateFrom"),
     dateTo: searchParams.get("dateTo"),
+    query: searchParams.get("query"),
   });
 
   const items = await prisma.sejour.findMany({

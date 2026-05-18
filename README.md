@@ -1,283 +1,355 @@
-# 🏨 Résidences Chanaude — Gestion hôtelière
+# Résidences Les Chanaude
 
-> Plateforme SaaS moderne de gestion hôtelière avec landing page client et panneau d'administration complet.
+Application Next.js de gestion hôtelière avec site public, registre administratif central, gestion des chambres, suivi client, audit et notifications.
 
----
+## Périmètre actuel
 
-## 📋 Vue d'ensemble
+Le projet couvre deux surfaces:
 
-**Résidences Chanaude** est une plateforme web complète de gestion hôtelière, composée de :
+- Un site public avec formulaire de demande de réservation.
+- Un back-office protégé avec un registre  des séjours.
 
-- **Un site vitrine public** — présentation premium de l'institut, des services et résidences, avec formulaire de réservation en ligne
-- **Un panneau d'administration protégé** — gestion des réservations, chambres et attributions avec notifications automatisées (email + SMS)
+Le tableau de bord est le point d’entrée administratif principal. Le registre reste la page opérationnelle pour les réservations, arrivées, encaissements et clôtures. L’entrée `/admin` redirige vers `/admin/dashboard`.
 
-**Public cible :** Étudiants/clients recherchant des résidences hôtelières et administrateurs gérant les réservations et chambres.
+## Flux métier implémentés
 
----
+### Demande web
 
-## 🛠️ Stack Technique
+1. Le client remplit le formulaire public.
+2. La demande est enregistrée en `en_attente`.
+3. Le client reçoit un accusé de réception.
+4. L’administration voit la demande dans le panneau de traitement.
 
-| Couche | Technologie |
-|--------|------------|
-| **Framework** | [Next.js 15](https://nextjs.org/) (App Router, SSR/SSG) |
-| **Langage** | TypeScript |
-| **Base de données** | MySQL via [Prisma ORM](https://www.prisma.io/) |
-| **Authentification** | [NextAuth.js v4](https://next-auth.js.org/) (JWT + Credentials) |
-| **UI Components** | [shadcn/ui](https://ui.shadcn.com/) (Radix UI primitives) |
-| **Styling** | [Tailwind CSS 3](https://tailwindcss.com/) |
-| **Animations** | [Framer Motion](https://www.framer.com/motion/) |
-| **Data Fetching** | [TanStack React Query](https://tanstack.com/query) |
-| **Validation** | [Zod](https://zod.dev/) |
-| **Email** | [Nodemailer](https://nodemailer.com/) (SMTP) |
-| **SMS** | Twilio / Vonage (optionnel) |
-| **Graphiques** | [Recharts](https://recharts.org/) |
+### Traitement administratif
 
----
+1. L’admin ou le gérant analyse la demande.
+2. La demande peut passer en `confirmee`, `refusee`, `annulee` ou `reportee`.
+3. Une demande confirmée peut ensuite être convertie en séjour planifié.
 
-## ✨ Fonctionnalités
+### Arrivée planifiée
 
-### Landing Page (Public)
-- 🎨 Design premium avec glassmorphism, gradients et micro-animations
-- 📱 Responsive mobile-first
-- 🏠 Sections : Hero (Bento grid), À Propos, Services, Résidences, FAQ, Localisation
-- 📝 Modal de réservation avec validation Zod
-- 🔍 SEO optimisé (JSON-LD, sitemap, robots.txt, Open Graph)
+Le registre pilote le tunnel d’arrivée:
 
-### Panneau d'Administration (Protégé)
-- 📊 **Dashboard** — Liste paginée des réservations avec filtres par statut
-- 🛏️ **Chambres** — CRUD complet (numéro, type, prix, capacité, statut)
-- 🔑 **Attributions** — Affectation chambre ↔ réservation acceptée (transaction atomique)
-- ✅ Accepter / ❌ Refuser des réservations en un clic
+1. Identité réelle et dossier.
+2. Finances et encaissement.
+3. Chambre, clé et activation.
 
-### Notifications Automatisées
-| Canal | Déclencheur | Destinataire |
-|-------|------------|--------------|
-| 📧 Email | Réservation reçue | Client + Admin |
-| 📧 Email | Réservation acceptée/refusée | Client |
-| 📱 SMS | Réservation reçue | Client + Manager |
-| 📱 SMS | Réservation acceptée/refusée | Client + Manager |
+À l’issue du tunnel, le séjour passe de `planifie` à `en_cours`.
 
-### Sécurité
-- 🔐 Authentification JWT (bcryptjs)
-- 👥 Système de rôles : `admin`, `manager`, `user`
-- 🛡️ Middleware NextAuth protégeant `/admin` et `/api/admin`
-- 🔒 Headers de sécurité (HSTS, X-Frame-Options, X-Content-Type-Options)
+### Vie du séjour
 
----
+Le dashboard centralise:
 
-## 📁 Architecture du Projet
+- les KPIs clients, séjours et réservations,
+- les alertes de départ, solde, arrivée et ménage,
+- les graphiques d’affluence et de répartition clients,
+- les cartes financières visibles uniquement par l’administrateur.
 
+Le registre permet:
+
+- l’encaissement de paiements supplémentaires,
+- la prolongation,
+- le report d’un séjour planifié,
+- le rappel manuel du client,
+- le suivi des retards,
+- la clôture manuelle,
+- le passage de la chambre en `attente_nettoyage`,
+- la remise en `disponible` après validation du ménage.
+
+### Rappels automatiques
+
+Les rappels J-1 sont déclenchés par un cron quotidien, pas par l’ouverture du registre.
+
+## Rôles
+
+Deux rôles sont actifs:
+
+- `admin`
+- `gerant`
+
+Les deux ont accès au back-office. Le système d’audit trace les actions critiques.
+
+## Stack technique
+
+- Next.js 15 App Router
+- TypeScript
+- Prisma ORM
+- MySQL
+- NextAuth v4 avec credentials
+- Tailwind CSS
+- shadcn/ui
+- Zod
+- Nodemailer
+
+## Structure utile
+
+```text
+src/
+  app/
+    page.tsx
+    auth/
+    admin/
+      dashboard/
+      registre/
+      chambres/
+      clients/
+      audit/
+    api/
+      reservations/
+      auth/
+      admin/
+        reservations/
+        stays/
+        chambres/
+        clients/
+        audit/
+  components/
+    admin/
+    landing/
+    ui/
+  lib/
+    api-utils.ts
+    audit.ts
+    auth.ts
+    client-utils.ts
+    email.ts
+    email-templates.ts
+    pricing.ts
+    prisma.ts
+    stay-reminders.ts
+    stay-utils.ts
+prisma/
+  schema.prisma
+  seed.ts
+  migrations/
+scripts/
+  run-stay-reminders.ts
 ```
-hotel/
-├── .github/workflows/       # CI/CD GitHub Actions
-│   └── ci.yml
-├── docs/
-│   └── https-setup.md       # Guide HTTPS / Certbot
-├── prisma/
-│   ├── schema.prisma         # Schéma BDD (5 modèles)
-│   ├── seed.ts               # Données initiales (admins, chambres, réservations)
-│   └── migrations/
-├── public/                   # Assets statiques
-├── src/
-│   ├── app/
-│   │   ├── page.tsx          # Landing page
-│   │   ├── layout.tsx        # Root layout (SEO, JSON-LD)
-│   │   ├── sitemap.ts        # Sitemap dynamique
-│   │   ├── robots.ts         # Robots.txt
-│   │   ├── auth/page.tsx     # Login admin
-│   │   ├── admin/            # Back-office
-│   │   │   ├── page.tsx      # Réservations
-│   │   │   ├── chambres/     # Gestion chambres
-│   │   │   ├── attribuer/    # Attributions
-│   │   │   └── loading.tsx   # Skeleton loading
-│   │   └── api/
-│   │       ├── auth/         # NextAuth endpoint
-│   │       ├── reservations/ # POST public
-│   │       └── admin/        # Routes protégées
-│   │           ├── reservations/
-│   │           ├── chambres/
-│   │           └── attributions/
-│   ├── components/
-│   │   ├── landing/          # Navbar, Hero, About, Services, etc.
-│   │   ├── admin/            # AdminSidebar
-│   │   └── ui/               # shadcn/ui components
-│   ├── lib/
-│   │   ├── auth.ts           # Config NextAuth
-│   │   ├── prisma.ts         # Prisma client singleton
-│   │   ├── api-utils.ts      # Error handler, validation, auth helpers
-│   │   ├── email.ts          # Service email
-│   │   ├── email-templates.ts # Templates HTML premium
-│   │   ├── sms.ts            # Service SMS
-│   │   └── utils.ts          # Utilitaires (cn)
-│   ├── hooks/                # Custom hooks (useAuth)
-│   └── middleware.ts         # Protection routes admin
-├── next.config.ts            # Config optimisée (headers, images, compression)
-├── tailwind.config.ts
-├── tsconfig.json
-└── package.json
-```
 
----
+## Modèle Prisma actuel
 
-## 🗃️ Modèle de Données
+Les tables principales sont:
 
-| Table | Description |
-|-------|-----------|
-| `users` | Utilisateurs admin/manager |
-| `user_roles` | Rôles associés (admin, manager, user) |
-| `chambres` | Chambres avec numéro, type, prix, capacité, statut |
-| `reservations` | Demandes de réservation clients |
-| `attributions` | Liaison chambre ↔ réservation (avec checkIn/checkOut) |
+- `users`
+- `user_roles`
+- `chambres`
+- `clients`
+- `reservations`
+- `sejours`
+- `stay_extensions`
+- `payments`
+- `client_notes`
+- `audit_logs`
+- `discount_requests`
+- `stay_deposits`
 
----
+Remarque importante:
 
-## 🚀 Installation & Démarrage
+- `Reservation` représente la demande initiale.
+- `Client` représente l’identité canonique.
+- `Sejour` représente la réalité opérationnelle.
+
+Ces recouvrements sont volontaires et servent à conserver les snapshots métier.
+
+## États utiles
+
+### Réservations
+
+- `en_attente`
+- `confirmee`
+- `convertie`
+- `refusee`
+- `annulee`
+- `reportee`
+
+### Séjours
+
+- `planifie`
+- `en_cours`
+- `termine`
+- `annule`
+
+### Chambres
+
+- `disponible`
+- `occupee`
+- `attente_nettoyage`
+- `maintenance`
+
+## Installation locale
 
 ### Prérequis
 
-- **Node.js** ≥ 18
-- **MySQL** ≥ 8.0
-- **npm** ≥ 9
+- Node.js 18+
+- npm 9+
+- MySQL 8+
 
-### 1. Cloner le projet
+### Variables d’environnement minimales
 
-```bash
-git clone https://github.com/votre-repo/residence-chanaude.git
-cd residence-chanaude
+Créer un `.env` avec au moins:
+
+```env
+DATABASE_URL="mysql://user:password@localhost:3306/chanaude"
+
+NEXTAUTH_SECRET="change-me"
+NEXTAUTH_URL="http://localhost:3000"
+
+SEED_ADMIN_EMAIL="admin@chanaude.ci"
+SEED_ADMIN_PASSWORD="ChanaudeAdmin!2026"
+SEED_GERANT_EMAIL="gerant@chanaude.ci"
+SEED_GERANT_PASSWORD="ChanaudeGerant!2026"
+
+SMTP_HOST=""
+SMTP_PORT=587
+SMTP_USER=""
+SMTP_PASS=""
+SMTP_FROM="Résidences Les Chanaude <noreply@chanaude.ci>"
+ADMIN_EMAIL="admin@chanaude.ci"
+
+SMS_PROVIDER=""
+MANAGER_PHONE=""
+
+CRON_SECRET="change-me-too"
 ```
 
-### 2. Installer les dépendances
+### Installation
 
 ```bash
 npm install
-```
-
-### 3. Configurer les variables d'environnement
-
-Copier et adapter `.env` :
-
-```env
-# Base de données
-DATABASE_URL="mysql://user:password@localhost:3306/hotels_db"
-
-# NextAuth
-NEXTAUTH_SECRET="your-super-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
-
-# Admins (seed)
-SEED_ADMIN1_EMAIL="onix@chanaude.ci"
-SEED_ADMIN1_PASSWORD="Admin123!"
-SEED_ADMIN2_EMAIL="admin@chanaude.ci"
-SEED_ADMIN2_PASSWORD="Admin123!"
-
-# Email (SMTP)
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT=587
-SMTP_USER="your-email@gmail.com"
-SMTP_PASS="your-app-password"
-SMTP_FROM="Résidences Chanaude <noreply@chanaude.ci>"
-ADMIN_EMAIL="admin@chanaude.ci"
-
-# SMS (optionnel)
-SMS_PROVIDER=""
-SMS_ACCOUNT_SID=""
-SMS_AUTH_TOKEN=""
-SMS_FROM_NUMBER=""
-MANAGER_PHONE=""
-```
-
-### 4. Initialiser la base de données
-
-```bash
-npx prisma migrate dev --name init
+npm run prisma:generate
+npx prisma migrate dev
 npm run prisma:seed
-```
-
-### 5. Lancer le serveur de développement
-
-```bash
 npm run dev
 ```
 
-L'application est accessible sur **http://localhost:3000**.
+## Audit métier
 
----
+Le suivi détaillé des fonctionnalités couvertes, partielles ou restantes est documenté dans [`docs/cahier-audit.md`](docs/cahier-audit.md).
 
-## 📡 API Reference
+## Comptes seed par défaut
 
-### Routes Publiques
+Si aucune variable `SEED_*` n’est fournie:
 
-| Méthode | Endpoint | Description |
-|---------|----------|-----------|
-| `POST` | `/api/reservations` | Créer une réservation client |
+- `admin@chanaude.ci` / `ChanaudeAdmin!2026`
+- `gerant@chanaude.ci` / `ChanaudeGerant!2026`
 
-### Routes Admin (JWT requis — rôle `admin` ou `manager`)
+## Scripts utiles
 
-| Méthode | Endpoint | Description |
-|---------|----------|-----------|
-| `GET` | `/api/admin/reservations` | Liste paginée des réservations |
-| `PATCH` | `/api/admin/reservations` | Changer le statut (accepter/refuser) |
-| `DELETE` | `/api/admin/reservations?id=` | Supprimer une réservation |
-| `GET` | `/api/admin/chambres` | Liste paginée des chambres |
-| `POST` | `/api/admin/chambres` | Créer une chambre |
-| `PATCH` | `/api/admin/chambres` | Modifier une chambre |
-| `DELETE` | `/api/admin/chambres?id=` | Supprimer une chambre |
-| `GET` | `/api/admin/attributions` | Liste des attributions |
-| `POST` | `/api/admin/attributions` | Attribuer une chambre |
-| `DELETE` | `/api/admin/attributions?id=&chambreId=` | Supprimer une attribution |
-| `GET` | `/api/admin/attributions/available` | Réservations & chambres disponibles |
+```bash
+npm run dev
+npm run dev:clean
+npm run build
+npm run start
+npm run lint
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:seed
+npm run cron:reminders
+```
 
----
+## Routes principales
 
-## 🔧 Scripts
+### Public
 
-| Script | Commande | Description |
-|--------|---------|-----------|
-| Dev | `npm run dev` | Serveur de développement |
-| Build | `npm run build` | Build de production |
-| Start | `npm run start` | Serveur de production |
-| Lint | `npm run lint` | Vérification ESLint |
-| Prisma Generate | `npm run prisma:generate` | Génère le client Prisma |
-| Prisma Migrate | `npm run prisma:migrate` | Applique les migrations |
-| Prisma Seed | `npm run prisma:seed` | Seed des données initiales |
+- `GET /`
+- `GET /auth`
+- `POST /api/reservations`
 
----
+### Back-office
 
-## 🚢 Déploiement
+- `GET /admin/registre`
+- `GET /admin/chambres`
+- `GET /admin/clients`
+- `GET /admin/audit`
 
-### Vercel (recommandé pour Next.js)
+### API admin principales
 
-1. Connecter le repo GitHub à [Vercel](https://vercel.com)
-2. Configurer les variables d'environnement dans le dashboard Vercel
-3. Vercel détecte automatiquement Next.js et déploie
+- `GET /api/admin/reservations`
+- `PATCH /api/admin/reservations`
+- `GET /api/admin/stays`
+- `POST /api/admin/stays`
+- `PATCH /api/admin/stays/[id]`
+- `POST /api/admin/stays/[id]/check-in`
+- `POST /api/admin/stays/[id]/payments`
+- `PATCH /api/admin/stays/[id]/report`
+- `POST /api/admin/stays/[id]/reminder`
+- `GET /api/admin/stays/reminders`
+- `POST /api/admin/stays/reminders`
+- `GET /api/admin/chambres`
+- `PATCH /api/admin/chambres`
 
-### Serveur VPS (avec Nginx)
+## Déploiement
 
-1. Cloner le projet sur le serveur
-2. Configurer Nginx comme reverse proxy (voir `docs/https-setup.md`)
-3. Obtenir un certificat SSL via Certbot
-4. Lancer l'application avec PM2 :
+### Vercel
+
+Le projet inclut `vercel.json` avec un cron quotidien:
+
+- chemin: `/api/admin/stays/reminders`
+- horaire: `0 8 * * *`
+
+À configurer côté plateforme:
+
+- `DATABASE_URL`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+- `CRON_SECRET`
+- variables SMTP/SMS si utilisées
+
+Le cron appelle la route avec `Authorization: Bearer <CRON_SECRET>`.
+
+### VPS
+
+Après build et lancement de l’application:
 
 ```bash
 npm run build
 pm2 start npm --name "residence-chanaude" -- start
 ```
 
----
+Ajouter ensuite le cron système:
 
-## 🔄 CI/CD
+```bash
+0 8 * * * cd /chemin/vers/hotel && npm run cron:reminders >> /var/log/residence-chanaude-reminders.log 2>&1
+```
 
-Le pipeline GitHub Actions (`.github/workflows/ci.yml`) exécute automatiquement :
+Sur VPS, le script exécute directement la logique métier et écrit l’audit en base.
 
-1. **Install** — `npm ci`
-2. **Prisma Generate** — Génère le client
-3. **Type-check** — `tsc --noEmit`
-4. **Build** — Production build
+## Notifications
 
-Déclenché sur push `main`/`develop` et pull requests.
+### Emails
 
----
+Les emails utilisent:
 
-## 📄 Licence
+- un logo inline `cid:chanaude-logo`
+- des templates HTML dans `src/lib/email-templates.ts`
+- un envoi SMTP via `src/lib/email.ts`
 
-Projet privé — © Résidences Chanaude. Tous droits réservés.
+Si le SMTP n’est pas configuré, les emails partent en mode preview dans la console.
+
+### SMS
+
+La couche SMS est abstraite dans `src/lib/sms.ts`.
+
+Si aucun provider n’est configuré, les SMS restent en mode preview console.
+
+## Vérifications recommandées
+
+Avant livraison:
+
+```bash
+npm run lint
+npm run build
+npx tsc --noEmit
+```
+
+## Note Prisma
+
+Le projet utilise Prisma 6.x.
+
+`schema.prisma` conserve encore:
+
+```prisma
+url = env("DATABASE_URL")
+```
+
+car `prisma validate` et `prisma generate` l’exigent encore dans cette version. `prisma.config.ts` est déjà présent pour la partie Migrate, mais la suppression complète de `url` attend une migration propre vers Prisma 7 et son nouveau mode de configuration.

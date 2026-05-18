@@ -79,10 +79,10 @@ export default async function ReceiptPage({ params, searchParams }: PageProps) {
   const balanceAfterPayment = Math.max(0, totals.totalNet - cumulativePaid);
   const isFinalReceipt = !requestedPayment;
   const receiptTitle = isFinalReceipt
-    ? "Reçu final"
+    ? "Facture finale"
     : requestedPayment?.type === "solde" && balanceAfterPayment <= 0
-      ? "Reçu de solde"
-      : "Reçu d'acompte";
+      ? "Facture de solde"
+      : "Facture d'acompte";
   const documentTitle = [
     receiptTitle.toLowerCase().replaceAll(" ", "-"),
     stay.code,
@@ -102,14 +102,9 @@ export default async function ReceiptPage({ params, searchParams }: PageProps) {
           <PrintButton label="PDF / Imprimer" documentTitle={documentTitle} />
         </div>
 
-        <Card className="p-4 text-sm text-muted-foreground print:hidden">
-          Pour obtenir un PDF, cliquez sur <span className="font-medium text-primary">PDF / Imprimer</span>, puis choisissez
-          <span className="font-medium text-primary"> Enregistrer au format PDF</span> dans la boîte d'impression du navigateur.
-        </Card>
-
         {!isFinalReceipt && requestedPayment ? null : totals.totalBalance > 0 ? (
           <Card className="p-6 print:border-0 print:shadow-none">
-            <h1 className="text-xl font-semibold text-primary">Reçu final indisponible</h1>
+            <h1 className="text-xl font-semibold text-primary">Facture finale indisponible</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Le solde du séjour n'est pas encore nul. Total restant: {formatCurrency(totals.totalBalance)}.
             </p>
@@ -120,7 +115,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps) {
           <Card className="p-8 space-y-6 print:border-0 print:shadow-none">
             <div className="flex items-start justify-between gap-4 border-b pb-6">
               <div>
-                <div className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Résidences Chanaude</div>
+                <div className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Résidences Les Chanaude</div>
                 <h1 className="mt-2 text-3xl font-semibold text-primary">{receiptTitle}</h1>
                 <p className="mt-1 text-sm text-muted-foreground">Émis le {format(new Date(), "dd/MM/yyyy HH:mm")}</p>
               </div>
@@ -153,7 +148,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps) {
 
             <div className="grid gap-3 md:grid-cols-3">
               <div className="rounded-lg border p-4">
-                <div className="text-xs uppercase tracking-wide text-muted-foreground">Montant total</div>
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">Coût total</div>
                 <div className="mt-2 text-2xl font-semibold">{formatCurrency(totals.totalNet)}</div>
               </div>
               <div className="rounded-lg border p-4">
@@ -200,7 +195,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps) {
                     <div>Date: {format(new Date(requestedPayment.paidAt), "dd/MM/yyyy HH:mm")}</div>
                     <div>Montant: {formatCurrency(requestedPayment.amount)}</div>
                     <div>Type: {paymentTypeLabels[requestedPayment.type] ?? requestedPayment.type}</div>
-                    <div>Méthode: {paymentMethodLabels[requestedPayment.method] ?? requestedPayment.method}</div>
+                    <div>Mode: {paymentMethodLabels[requestedPayment.method] ?? requestedPayment.method}</div>
                     <div className="md:col-span-2">Imputation: {requestedPayment.scopeLabel}</div>
                     {requestedPayment.notes ? <div className="md:col-span-2">Note: {requestedPayment.notes}</div> : null}
                   </div>
@@ -213,7 +208,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps) {
                   <div className="grid grid-cols-[1fr_1fr_1fr_1.5fr] gap-3 border-b px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     <div>Date</div>
                     <div>Type</div>
-                    <div>Méthode</div>
+                    <div>Mode</div>
                     <div className="text-right">Montant</div>
                   </div>
                   {orderedPayments.map((payment: any) => (

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,9 +11,6 @@ interface HeroProps {
 }
 
 export const Hero = ({ onReserve }: HeroProps) => {
-  const [tick, setTick] = useState(() => Date.now());
-  // helper pour mettre à jour manuellement l'état local afin d'observer Fast Refresh/Hot Reload
-  const bump = () => setTick(Date.now());
   return (
     <section id="hero" className="relative min-h-screen pt-28 pb-20 overflow-hidden grain">
       {/* Ambient gradients */}
@@ -33,7 +29,7 @@ export const Hero = ({ onReserve }: HeroProps) => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass shadow-soft">
               <Sparkles className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium text-primary"> Résidences Les Chanaudes</span>
+              <span className="text-sm font-medium text-primary"> Résidences Les Chanaude</span>
             </div>
 
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] text-primary">
@@ -94,7 +90,7 @@ export const Hero = ({ onReserve }: HeroProps) => {
               <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
               <div className="absolute bottom-5 left-5 text-primary-foreground">
                 <div className="text-xs uppercase tracking-widest opacity-80">Bienvenue</div>
-                <div className="font-display text-xl font-semibold">Résidences les Chanaudes</div>
+                <div className="font-display text-xl font-semibold">Résidences les Chanaude</div>
               </div>
             </motion.div>
 

@@ -7,17 +7,17 @@ const baseUrl = process.env.NEXTAUTH_URL || "https://chanaude.ci";
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Résidences Les Chanaudes Mondoukou — Résidences Premium Bassam",
-    template: "%s | Résidences Les Chanaudes",
+    default: "Résidences Les Chanaude  — Résidences à Bassam, Abidjan",
+    template: "%s | Résidences Les Chanaude",
   },
   description:
-    "Réservez votre résidence premium aux Résidences les Chanaudes. Cadre raffiné, services inclus, idéalement situé à Abidjan, Côte d'Ivoire.",
+    "Réservez votre résidence aux Résidences les Chanaude. Cadre raffiné, services inclus, idéalement situé à Abidjan, Côte d'Ivoire.",
   keywords: [
-    "Lees chanaudes",
-    "résidences les chanaudes",
+    "Lees Chanaude",
+    "résidences les Chanaude",
     "résidences chanaude",
     "residence chanaude mondoukou",
-    "chanaudes mondoukou",
+    "Chanaude mondoukou",
     "résidence",
     "réservation",
     "Côte d'Ivoire",
@@ -28,24 +28,24 @@ export const metadata: Metadata = {
     "logement",
     "hôtel",
   ],
-  authors: [{ name: "Résidences Les Chanaudes" }],
-  creator: "Résidences Les Chanaudes ",
+  authors: [{ name: "Résidences Les Chanaude" }],
+  creator: "Résidences Les Chanaude ",
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Résidences Les Chanaudes — Résidences Premium",
+    title: "Résidences Les Chanaude — Résidences Premium",
     description:
       "Vivez une expérience résidentielle d'exception. Résidences premium, services inclus, à Bassam.",
     type: "website",
     locale: "fr_CI",
     url: baseUrl,
-    siteName: "Résidences Les Chanaudes",
+    siteName: "Résidences Les Chanaude",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Résidences Les Chanaudes",
+    title: "Résidences Les Chanaude",
     description:
-      "Réservez votre résidence aux Résidences Les Chanaudes. Services inclus, cadre raffiné.",
+      "Réservez votre résidence aux Résidences Les Chanaude. Services inclus, cadre raffiné.",
   },
 };
 
@@ -53,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Hotel",
-    name: "Les Résidences Les Chanaudes",
+    name: "Les Résidences Les Chanaude",
     description:
       "Résidences ideals pour vous détendre en famille ou entre amis.",
     url: baseUrl,

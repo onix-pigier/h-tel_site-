@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { UtensilsCrossed, Wifi,Car, Sparkles, WavesIcon, HandshakeIcon } from "lucide-react";
-
+import { Car, HandshakeIcon, UtensilsCrossed, WavesIcon, Wifi } from "lucide-react";
 
 const services = [
   { icon: UtensilsCrossed, title: "Restauration", desc: "Savourez vos repas face à l'horizon avec une vue imprenable sur l'eau.." },

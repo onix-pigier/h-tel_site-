@@ -1,31 +1,48 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@/generated/prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { withErrorHandler, requireStaff, validateBody, ApiError } from "@/lib/api-utils";
-import { applyDiscount, calculateOfferAmount, derivePaymentStatus, offerMatchesRoomCategory } from "@/lib/pricing";
+import {
+  applyDiscount,
+  calculateOfferAmount,
+  derivePaymentStatus,
+  DISCOUNT_CODES,
+  OFFER_CODES,
+  isOfferCompatibleWithRoom,
+  PAYMENT_ARRANGEMENT_CODES,
+} from "@/lib/pricing";
 import { findOrCreateClient } from "@/lib/client-utils";
 import { sendReservationAccepted } from "@/lib/email";
 import { smsReservationAccepted, smsManagerReservationProcessed } from "@/lib/sms";
+import { logAudit, auditFrom } from "@/lib/audit";
+import { generateStayCode } from "@/lib/reference";
 
 const createSchema = z.object({
   reservationId: z.string().uuid("ID de réservation invalide"),
   chambreId: z.string().uuid("ID de chambre invalide"),
-  offer: z.enum(["nuitee", "forfait", "passage", "villa_1ch", "villa_2ch", "longue_duree", "personnalise"]),
+  offer: z.enum(OFFER_CODES),
   startAt: z.string().min(1, "Date de début requise"),
   endAt: z.string().optional().nullable(),
-  discountType: z.enum(["none", "percent", "fixed"]).default("none"),
+  discountType: z.enum(DISCOUNT_CODES).default("none"),
   discountValue: z.coerce.number().min(0).default(0),
-  paymentArrangement: z.enum(["immediat", "avance_partielle", "fin_sejour"]).default("fin_sejour"),
+  paymentArrangement: z.enum(PAYMENT_ARRANGEMENT_CODES).default("fin_sejour"),
+  paymentMethod: z.enum(["especes", "mobile_money", "carte", "virement", "autre"]).default("especes"),
   initialPayment: z.coerce.number().min(0).default(0),
+  paymentOperator: z.string().trim().max(80).optional().nullable(),
+  payerPhone: z.string().trim().max(30).optional().nullable(),
+  paymentReference: z.string().trim().max(120).optional().nullable(),
+  paymentPaidAt: z.string().optional().nullable(),
   notes: z.string().trim().max(1000).optional().nullable(),
   customAmount: z.coerce.number().min(0).optional().nullable(),
+  dayCount: z.coerce.number().int().min(1).max(365).optional().nullable(),
 });
 
 export const GET = withErrorHandler(async () => {
   await requireStaff();
 
   const items = await prisma.sejour.findMany({
-    where: { source: "web" },
+    where: { workflowKind: "web" },
     include: {
       client: true,
       chambre: { select: { numero: true, type: true } },
@@ -40,7 +57,7 @@ export const GET = withErrorHandler(async () => {
 });
 
 export const POST = withErrorHandler(async (req: Request) => {
-  await requireStaff();
+  const staff = await requireStaff();
   const body = await req.json();
   const data = validateBody(createSchema, body);
 
@@ -49,8 +66,8 @@ export const POST = withErrorHandler(async (req: Request) => {
     include: { client: true, sejour: true },
   });
   if (!reservation) throw new ApiError(404, "Réservation introuvable.");
-  if (!["validee", "acceptee"].includes(reservation.status)) {
-    throw new ApiError(409, "La réservation doit être validée avant attribution.");
+  if (reservation.status !== "confirmee") {
+    throw new ApiError(409, "La réservation doit être confirmée avant attribution.");
   }
   if (reservation.sejour) {
     throw new ApiError(409, "Cette réservation est déjà convertie en séjour.");
@@ -63,17 +80,16 @@ export const POST = withErrorHandler(async (req: Request) => {
         lastName: reservation.lastName,
         email: reservation.email,
         phone: reservation.phone,
-        documentNumber: reservation.documentNumber ?? null,
-        documentType: reservation.documentType ?? null,
-        birthDate: reservation.birthDate ?? null,
-        age: reservation.age ?? null,
+        nationality: reservation.nationality ?? null,
+        gender: reservation.gender ?? null,
       });
 
   const chambre = await prisma.chambre.findUnique({ where: { id: data.chambreId } });
   if (!chambre) throw new ApiError(404, "Chambre introuvable.");
   if (chambre.status === "maintenance") throw new ApiError(409, "La chambre est en maintenance.");
-  if (!offerMatchesRoomCategory(data.offer, chambre.categorie)) {
-    throw new ApiError(409, "Offre incompatible avec la catégorie de chambre sélectionnée.");
+  if (chambre.status === "occupee") throw new ApiError(409, "La chambre est déjà occupée.");
+  if (!isOfferCompatibleWithRoom(data.offer, { categorie: chambre.categorie, prix: Number(chambre.prix) })) {
+    throw new ApiError(409, "Offre incompatible avec la chambre sélectionnée.");
   }
 
   const startAt = new Date(data.startAt);
@@ -84,6 +100,9 @@ export const POST = withErrorHandler(async (req: Request) => {
   if (endAt && Number.isNaN(endAt.getTime())) {
     throw new ApiError(400, "Date de fin invalide.");
   }
+  if (chambre.status === "attente_nettoyage" && startAt <= new Date()) {
+    throw new ApiError(409, "La chambre attend le ménage et ne peut pas être attribuée pour un démarrage immédiat.");
+  }
 
   const pricing = calculateOfferAmount({
     offer: data.offer,
@@ -91,41 +110,83 @@ export const POST = withErrorHandler(async (req: Request) => {
     endAt,
     customAmount: data.customAmount ?? null,
     roomDailyRate: Number(chambre.prix),
+    dayCount: data.dayCount ?? null,
   });
 
-  if (pricing.normalizedEndAt <= startAt) {
+  if (pricing.normalizedEndAt <= pricing.normalizedStartAt) {
     throw new ApiError(400, "La date de fin du séjour doit être postérieure à la date de début.");
   }
-  const discountAmount = applyDiscount(pricing.baseAmount, (data.discountType ?? "none"), (data.discountValue ?? 0));
-  const netAmount = Math.max(0, pricing.baseAmount - discountAmount);
-  const amountPaid = Math.min(netAmount, data.initialPayment ?? 0);
-  const paymentStatus = derivePaymentStatus(netAmount, amountPaid, amountPaid > 0 ? 1 : 0);
-
-  const overlappingStay = await prisma.sejour.findFirst({
-    where: {
-      chambreId: chambre.id,
-      status: { in: ["planifie", "en_cours"] },
-      startedAt: { lt: pricing.normalizedEndAt },
-      currentEndAt: { gt: startAt },
-    },
-    select: { id: true },
-  });
-
-  if (overlappingStay) {
-    throw new ApiError(409, "Cette chambre est déjà occupée ou planifiée sur la période sélectionnée.");
+  if (!staff.isAdmin && (data.discountType ?? "none") !== "none" && (data.discountValue ?? 0) > 0) {
+    throw new ApiError(403, "La remise doit faire l'objet d'une demande validée par un administrateur.");
   }
 
+  const effectiveStartAt = pricing.normalizedStartAt;
+  const discountAmount = applyDiscount(pricing.baseAmount, (data.discountType ?? "none"), (data.discountValue ?? 0));
+  const netAmount = Math.max(0, pricing.baseAmount - discountAmount);
+  const amountPaid = data.initialPayment ?? 0;
+  const paymentMethod = data.paymentMethod ?? "especes";
   const now = new Date();
-  const stay = await prisma.$transaction(async (tx ) => {
+  const requestedAdvanceAmount = Number(reservation.requestedAdvanceAmount ?? 0);
+  if (amountPaid > netAmount) {
+    throw new ApiError(400, "Le montant encaissé dépasse le total net du séjour.");
+  }
+  const paymentPaidAt = data.paymentPaidAt ? new Date(data.paymentPaidAt) : now;
+  if (Number.isNaN(paymentPaidAt.getTime())) {
+    throw new ApiError(400, "Heure de paiement invalide.");
+  }
+  const requiresPaymentTrace = amountPaid > 0 && paymentMethod !== "especes";
+  if (requiresPaymentTrace && (!(data.paymentOperator ?? "").trim() || !(data.payerPhone ?? "").trim() || !(data.paymentReference ?? "").trim())) {
+    throw new ApiError(400, "Opérateur, numéro payeur et référence transaction sont requis pour ce paiement.");
+  }
+  if (requestedAdvanceAmount > 0 && amountPaid < requestedAdvanceAmount) {
+    throw new ApiError(409, "L'acompte encaissé est inférieur à l'acompte demandé.");
+  }
+  if (data.offer === "personnalise" && !(data.notes ?? "").trim()) {
+    throw new ApiError(400, "Une justification est requise pour une offre personnalisée.");
+  }
+  if (data.paymentArrangement === "immediat" && amountPaid < netAmount) {
+    throw new ApiError(409, "Le mode 'paiement immédiat' impose un encaissement complet.");
+  }
+  if (data.paymentArrangement === "avance_partielle" && amountPaid <= 0) {
+    throw new ApiError(409, "Un acompte doit être encaissé.");
+  }
+  const paymentStatus = derivePaymentStatus(netAmount, amountPaid, amountPaid > 0 ? 1 : 0);
+
+  const resolvedClientId = reservation.clientId ?? client?.id ?? reservation.client?.id;
+  if (!resolvedClientId) {
+    throw new ApiError(409, "Impossible de rattacher cette réservation à un client.");
+  }
+
+  const stay = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const overlappingStay = await tx.sejour.findFirst({
+      where: {
+        chambreId: chambre.id,
+        status: { in: ["planifie", "en_cours"] },
+        startedAt: { lt: pricing.normalizedEndAt },
+        currentEndAt: { gt: effectiveStartAt },
+      },
+      select: { id: true },
+    });
+
+    if (overlappingStay) {
+      throw new ApiError(409, "Cette chambre est déjà occupée ou planifiée sur la période sélectionnée.");
+    }
     const created = await tx.sejour.create({
       data: {
-        clientId: reservation.clientId ?? client?.id ?? reservation.client?.id ?? "",
+        code: generateStayCode("web"),
+        clientId: resolvedClientId,
         chambreId: chambre.id,
         reservationId: reservation.id,
         source: "web",
-        status: startAt <= now ? "en_cours" : "planifie",
+        workflowKind: "web",
+        status: effectiveStartAt <= now ? "en_cours" : "planifie",
         offer: data.offer,
-        startedAt: startAt,
+        guestCount: reservation.guestCount ?? null,
+        plannedStartAt: effectiveStartAt,
+        plannedEndAt: pricing.normalizedEndAt,
+        plannedStartAtOriginal: reservation.dateArriveeOriginal ?? reservation.dateArrivee ?? startAt,
+        plannedEndAtOriginal: reservation.dateDepartOriginal ?? reservation.dateDepart ?? pricing.normalizedEndAt,
+        startedAt: effectiveStartAt,
         endedAt: pricing.normalizedEndAt,
         currentEndAt: pricing.normalizedEndAt,
         baseAmount: pricing.baseAmount,
@@ -138,7 +199,7 @@ export const POST = withErrorHandler(async (req: Request) => {
         paymentArrangement: data.paymentArrangement,
         paymentStatus,
         notes: data.notes ?? reservation.notes ?? null,
-        checkedInAt: startAt <= now ? now : null,
+        checkedInAt: effectiveStartAt <= now ? now : null,
       },
       include: { chambre: { select: { numero: true, type: true } } },
     });
@@ -147,10 +208,13 @@ export const POST = withErrorHandler(async (req: Request) => {
       await tx.payment.create({
         data: {
           stayId: created.id,
-          paidAt: now,
+          paidAt: paymentPaidAt,
           amount: amountPaid,
-          method: "mobile_money",
+          method: paymentMethod,
           type: amountPaid >= netAmount ? "solde" : "acompte",
+          operator: requiresPaymentTrace ? data.paymentOperator?.trim() : null,
+          payerPhone: requiresPaymentTrace ? data.payerPhone?.trim() : null,
+          transactionReference: requiresPaymentTrace ? data.paymentReference?.trim() : null,
           notes: "Paiement initial lors de l'attribution.",
         },
       });
@@ -158,10 +222,10 @@ export const POST = withErrorHandler(async (req: Request) => {
 
     await tx.reservation.update({
       where: { id: reservation.id },
-      data: { status: "convertie", clientId: reservation.clientId ?? client?.id ?? reservation.client?.id ?? null },
+      data: { status: "convertie", clientId: resolvedClientId },
     });
 
-    if (startAt <= now && chambre.status !== "maintenance") {
+    if (effectiveStartAt <= now && chambre.status !== "maintenance") {
       await tx.chambre.update({
         where: { id: chambre.id },
         data: { status: "occupee" },
@@ -169,7 +233,7 @@ export const POST = withErrorHandler(async (req: Request) => {
     }
 
     return created;
-  });
+  }, { isolationLevel: "Serializable", maxWait: 5000, timeout: 10000 });
 
   sendReservationAccepted(
     reservation.email,
@@ -184,11 +248,22 @@ export const POST = withErrorHandler(async (req: Request) => {
     console.error("SMS manager failed:", error)
   );
 
+  await logAudit({
+    ...auditFrom(staff),
+    action: "attribution.create",
+    targetType: "sejour",
+    targetId: stay.id,
+    details: { reservationId: reservation.id, reference: reservation.reference, chambre: stay.chambre.numero },
+  });
+
   return NextResponse.json(stay, { status: 201 });
 });
 
 export const DELETE = withErrorHandler(async (req: Request) => {
-  await requireStaff();
+  const staff = await requireStaff();
+  if (!staff.isAdmin) {
+    throw new ApiError(403, "Seuls les administrateurs peuvent supprimer une attribution.");
+  }
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
@@ -204,18 +279,26 @@ export const DELETE = withErrorHandler(async (req: Request) => {
     throw new ApiError(409, "Impossible de supprimer un séjour avec paiements ou extensions.");
   }
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.sejour.delete({ where: { id } });
     if (stay.reservationId) {
       await tx.reservation.update({
         where: { id: stay.reservationId },
-        data: { status: "validee" },
+        data: { status: "confirmee" },
       });
     }
     await tx.chambre.update({
       where: { id: stay.chambreId },
       data: { status: "disponible" },
     });
+  });
+
+  await logAudit({
+    ...auditFrom(staff),
+    action: "attribution.delete",
+    targetType: "sejour",
+    targetId: id,
+    details: { code: stay.code, reservationId: stay.reservationId },
   });
 
   return NextResponse.json({ ok: true });

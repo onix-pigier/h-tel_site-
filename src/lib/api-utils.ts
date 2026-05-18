@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError, ZodSchema } from "zod";
-import { Prisma } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 // ─── Custom API Error ────────────────────────────────────────
 
@@ -25,48 +26,51 @@ function errorResponse(status: number, message: string, details?: unknown) {
 
 // ─── Route Handler Wrapper ───────────────────────────────────
 
-type RouteHandler = (req: Request, context?: any) => Promise<NextResponse>;
+type RouteHandler<TContext = unknown> = (req: Request, context: TContext) => Promise<NextResponse>;
 
-export function withErrorHandler(handler: RouteHandler): RouteHandler {
-  return async (req: Request, context?: any) => {
+export function withErrorHandler<TContext = unknown>(
+  handler: RouteHandler<TContext>
+): RouteHandler<TContext> {
+  return async (req: Request, context: TContext) => {
     try {
       return await handler(req, context);
-    } catch (error) {
+    } catch (err: unknown) {
       // Known API errors
-      if (error instanceof ApiError) {
-        return errorResponse(error.statusCode, error.message, error.details);
+      if (err instanceof ApiError) {
+        return errorResponse(err.statusCode, err.message, err.details);
       }
 
       // Zod validation errors
-      if (error instanceof ZodError) {
-        return errorResponse(400, "Données invalides", error.flatten().fieldErrors);
+      if (err instanceof ZodError) {
+        return errorResponse(400, "Données invalides", err.flatten().fieldErrors);
       }
 
-      // Prisma errors
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        console.error(`[PRISMA ${error.code}]`, error.message);
+      // Prisma errors — use duck typing to avoid import issues
+      if (err instanceof Error && err.constructor?.name === "PrismaClientKnownRequestError") {
+        const prismaErr = err as Error & { code: string; meta?: Record<string, unknown> };
+        console.error(`[PRISMA ${prismaErr.code}]`, prismaErr.message);
 
-        if (error.code === "P2002") {
-          const target = (error.meta?.target as string[])?.join(", ") ?? "champ";
+        if (prismaErr.code === "P2002") {
+          const target = (prismaErr.meta?.target as string[])?.join(", ") ?? "champ";
           return errorResponse(409, `Une entrée avec ce ${target} existe déjà.`);
         }
-        if (error.code === "P2025") {
+        if (prismaErr.code === "P2025") {
           return errorResponse(404, "Ressource introuvable.");
         }
-        if (error.code === "P2003") {
+        if (prismaErr.code === "P2003") {
           return errorResponse(409, "Impossible de supprimer : cette ressource est liée à d'autres données.");
         }
 
         return errorResponse(500, "Erreur de base de données.");
       }
 
-      if (error instanceof Prisma.PrismaClientValidationError) {
-        console.error("[PRISMA VALIDATION]", error.message);
+      if (err instanceof Error && err.constructor?.name === "PrismaClientValidationError") {
+        console.error("[PRISMA VALIDATION]", err.message);
         return errorResponse(400, "Données invalides pour la base de données.");
       }
 
       // Unexpected errors
-      console.error("[UNHANDLED ERROR]", error);
+      console.error("[UNHANDLED ERROR]", err);
       return errorResponse(500, "Une erreur interne est survenue. Veuillez réessayer.");
     }
   };
@@ -77,19 +81,21 @@ export function withErrorHandler(handler: RouteHandler): RouteHandler {
 export function validateBody<T>(schema: ZodSchema<T>, data: unknown): T {
   const result = schema.safeParse(data);
   if (!result.success) {
-    throw new ApiError(400, "Données invalides", result.error.flatten().fieldErrors);
+    // Return issues[] format with path + message for inline field errors
+    const details = result.error.issues.map((issue) => ({
+      path: issue.path,
+      message: issue.message,
+    }));
+    throw new ApiError(400, "Données invalides", details);
   }
   return result.data;
 }
 
 // ─── Auth Check Helper ───────────────────────────────────────
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-
 export async function requireStaff() {
   const session = await getServerSession(authOptions);
-  const user = session?.user as any;
+  const user = session?.user;
   if (!user?.isStaff) {
     throw new ApiError(401, "Accès non autorisé. Connexion requise.");
   }

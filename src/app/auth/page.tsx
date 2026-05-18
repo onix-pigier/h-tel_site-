@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -19,18 +19,58 @@ const schema = z.object({
   password: z.string().min(6, "6 caractères minimum").max(100),
 });
 
-export default function AuthPage() {
+function normalizeCallbackUrl(raw: string | null | undefined, fallback: string) {
+  if (!raw) return fallback;
+
+  try {
+    const candidate = raw.startsWith("http") ? new URL(raw).pathname + new URL(raw).search : raw;
+    const normalized = candidate.startsWith("/") ? candidate : "/" + candidate;
+
+    if (normalized === "/" || normalized === "/admin") return fallback;
+    if (normalized.startsWith("/auth")) return fallback;
+
+    return normalized;
+  } catch {
+    return fallback;
+  }
+}
+
+function AuthPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isStaff, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [clearingSession, setClearingSession] = useState(false);
+  const handledUnauthorizedSession = useRef(false);
+  const requestedCallbackUrl = searchParams.get("callbackUrl");
+  const staffTarget = useMemo(
+    () => normalizeCallbackUrl(requestedCallbackUrl, "/admin/registre"),
+    [requestedCallbackUrl]
+  );
 
   useEffect(() => {
-    if (!authLoading && user) {
-      router.replace(isStaff ? "/admin" : "/");
+    if (authLoading || !user) {
+      if (!user) handledUnauthorizedSession.current = false;
+      return;
     }
-  }, [user, isStaff, authLoading, router]);
+
+    if (isStaff) {
+      router.replace(staffTarget);
+      return;
+    }
+
+    if (handledUnauthorizedSession.current) return;
+    handledUnauthorizedSession.current = true;
+    setClearingSession(true);
+
+    void signOut({ redirect: false }).finally(() => {
+      setClearingSession(false);
+      router.replace("/auth");
+      router.refresh();
+    });
+  }, [user, isStaff, authLoading, router, staffTarget]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,18 +79,22 @@ export default function AuthPage() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
+    const { email: normalizedEmail, password: normalizedPassword } = parsed.data;
+
     setLoading(true);
     try {
       const result = await signIn("credentials", {
-        email,
-        password,
+        email: normalizedEmail.toLowerCase(),
+        password: normalizedPassword,
         redirect: false,
+        callbackUrl: staffTarget,
       });
       if (result?.error) {
         toast.error("Identifiants invalides");
       } else {
         toast.success("Connexion réussie");
-        router.replace("/admin");
+        router.replace(staffTarget);
+        router.refresh();
       }
     } catch {
       toast.error("Erreur de connexion");
@@ -74,10 +118,10 @@ export default function AuthPage() {
         className="relative w-full max-w-md rounded-3xl glass shadow-elegant p-8"
       >
         <div className="text-center mb-7">
-          <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center ">
-            <Image src="/assets/logo1.png" alt="Résidences Les Chanaudes" width={69} height={69} className="object-contain" />
+          <div className="w-28 h-28 mx-auto rounded-2xl flex items-center justify-center ">
+            <Image src="/assets/logo1.png" alt="Résidences Les Chanaude" width={120} height={120} className="object-contain" priority />
           </div>
-          <h1 className="font-display text-2xl font-bold text-primary">Espace Administration</h1>
+          <h1 className="font-display text-2xl font-bold text-primary">Administration</h1>
           <p className="text-sm text-muted-foreground mt-1">Connectez-vous</p>
         </div>
 
@@ -118,17 +162,29 @@ export default function AuthPage() {
 
           <Button
             type="submit"
-            disabled={loading}
+            disabled={loading || clearingSession}
             className="w-full h-12 rounded-2xl gradient-sunset text-accent-foreground font-semibold shadow-elegant"
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Se connecter"}
+            {loading || clearingSession ? <Loader2 className="w-4 h-4 animate-spin" /> : "Se connecter"}
           </Button>
 
           <p className="text-xs text-center text-muted-foreground pt-2 opacity-80">
-            © {new Date().getFullYear()} Résidences Les Chanaudes. Tous droits réservés.
+            © {new Date().getFullYear()} Kehogroupe. Tous droits réservés.
           </p>
         </form>
       </motion.div>
     </div>
+  );
+}
+
+function AuthPageFallback() {
+  return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/10" />;
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<AuthPageFallback />}>
+      <AuthPageContent />
+    </Suspense>
   );
 }

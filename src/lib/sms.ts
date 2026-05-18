@@ -43,7 +43,7 @@ async function sendSms(to: string, message: string): Promise<SmsResult> {
 // ─── Public API ──────────────────────────────────────────────
 
 export async function smsReservationReceived(clientPhone: string, firstName: string) {
-  const message = `Résidences Chanaude — Bonjour ${firstName}, votre demande de réservation a bien été reçue. Notre équipe l'examine et vous répondra sous 24-48h. Merci de votre confiance !`;
+  const message = `Résidences Les Chanaude — Bonjour ${firstName}, votre demande de réservation a bien été reçue. Notre équipe l'examine et vous répondra sous 24-48h. Merci de votre confiance !`;
   return sendSms(clientPhone, message);
 }
 
@@ -53,12 +53,12 @@ export async function smsReservationAccepted(
   chambreNumero?: string
 ) {
   const chambreText = chambreNumero ? ` Chambre N°${chambreNumero} attribuée.` : "";
-  const message = `Résidences Chanaude — Félicitations ${firstName} ! 🎉 Votre réservation est acceptée.${chambreText} Nous avons hâte de vous accueillir. Consultez votre email pour les détails.`;
+  const message = `Résidences Les Chanaude — Félicitations ${firstName} ! 🎉 Votre réservation est acceptée.${chambreText} Nous avons hâte de vous accueillir. Consultez votre email pour les détails.`;
   return sendSms(clientPhone, message);
 }
 
 export async function smsReservationRefused(clientPhone: string, firstName: string) {
-  const message = `Résidences Chanaude — Bonjour ${firstName}, après examen de votre dossier, nous ne pouvons malheureusement pas donner suite à votre demande. N'hésitez pas à nous recontacter. Cordialement, L'équipe Résidences Chanaude.`;
+  const message = `Résidences Les Chanaude — Bonjour ${firstName}, nous ne disposons malheureusement plus d'une disponibilité adaptée pour les dates souhaitées. N'hésitez pas à nous recontacter pour une autre proposition. Cordialement, l'équipe Résidences Les Chanaude.`;
   return sendSms(clientPhone, message);
 }
 
@@ -74,7 +74,7 @@ export async function smsNotifyManager(message: string) {
 /** Notify manager of a new reservation */
 export async function smsManagerNewReservation(firstName: string, lastName: string) {
   return smsNotifyManager(
-    `Résidences Chanaude Admin — Nouvelle demande de réservation de ${firstName} ${lastName}. Connectez-vous au tableau de bord pour la traiter.`
+    `Résidences Les Chanaude Admin — Nouvelle demande de réservation de ${firstName} ${lastName}. Connectez-vous au tableau de bord pour la traiter.`
   );
 }
 
@@ -85,6 +85,11 @@ export async function smsManagerReservationProcessed(
   status: "acceptée" | "refusée"
 ) {
   return smsNotifyManager(
-    `Résidences Chanaude Admin — La réservation de ${firstName} ${lastName} a été ${status}. Le client a été notifié par email et SMS.`
+    `Résidences Les Chanaude Admin — La réservation de ${firstName} ${lastName} a été ${status}. Le client a été notifié par email et SMS.`
   );
+}
+
+export async function smsStayReminder(clientPhone: string, firstName: string, stayLabel: string) {
+  const message = `Résidences Les Chanaude — Bonjour ${firstName}, rappel de votre arrivée prévue ${stayLabel}. Merci de confirmer votre heure d'arrivée.`;
+  return sendSms(clientPhone, message);
 }

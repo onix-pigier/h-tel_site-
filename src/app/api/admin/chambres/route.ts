@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { withErrorHandler, requireStaff, validateBody, ApiError } from "@/lib/api-utils";
+import { logAudit, auditFrom } from "@/lib/audit";
 
 const createSchema = z.object({
   numero: z.string().trim().min(1, "Numéro requis").max(20),
@@ -10,7 +11,7 @@ const createSchema = z.object({
   prix: z.coerce.number().min(0, "Prix doit être >= 0").default(0),
   capacite: z.coerce.number().int().min(1, "Capacité min 1").default(1),
   description: z.string().trim().max(500).optional().nullable(),
-  status: z.enum(["disponible", "occupee", "maintenance"]).default("disponible"),
+  status: z.enum(["disponible", "occupee", "attente_nettoyage", "maintenance"]).default("disponible"),
 });
 
 const updateSchema = z.object({
@@ -21,7 +22,7 @@ const updateSchema = z.object({
   prix: z.coerce.number().min(0).optional(),
   capacite: z.coerce.number().int().min(1).optional(),
   description: z.string().trim().max(500).optional().nullable(),
-  status: z.enum(["disponible", "occupee", "maintenance"]).optional(),
+  status: z.enum(["disponible", "occupee", "attente_nettoyage", "maintenance"]).optional(),
 });
 
 export const GET = withErrorHandler(async (req: Request) => {
@@ -50,25 +51,57 @@ export const GET = withErrorHandler(async (req: Request) => {
 });
 
 export const POST = withErrorHandler(async (req: Request) => {
-  await requireStaff();
+  const staff = await requireStaff();
   const body = await req.json();
   const data = validateBody(createSchema, body);
 
   const chambre = await prisma.chambre.create({ data });
+
+  await logAudit({
+    ...auditFrom(staff),
+    action: "chambre.create",
+    targetType: "chambre",
+    targetId: chambre.id,
+    details: { numero: chambre.numero, type: chambre.type },
+  });
+
   return NextResponse.json(chambre, { status: 201 });
 });
 
 export const PATCH = withErrorHandler(async (req: Request) => {
-  await requireStaff();
+  const staff = await requireStaff();
   const body = await req.json();
   const { id, ...data } = validateBody(updateSchema, body);
 
+  if (data.status && data.status !== "occupee") {
+    const activeStay = await prisma.sejour.findFirst({
+      where: {
+        chambreId: id,
+        status: "en_cours",
+      },
+      select: { id: true },
+    });
+
+    if (activeStay) {
+      throw new ApiError(409, "Impossible de modifier ce statut tant qu'un séjour est en cours dans cette chambre.");
+    }
+  }
+
   const updated = await prisma.chambre.update({ where: { id }, data });
+
+  await logAudit({
+    ...auditFrom(staff),
+    action: "chambre.update",
+    targetType: "chambre",
+    targetId: id,
+    details: data,
+  });
+
   return NextResponse.json(updated);
 });
 
 export const DELETE = withErrorHandler(async (req: Request) => {
-  await requireStaff();
+  const staff = await requireStaff();
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
@@ -80,9 +113,18 @@ export const DELETE = withErrorHandler(async (req: Request) => {
   });
 
   if (activeStay) {
-    throw new ApiError(409, "Impossible de supprimer une chambre liée à un séjour actif ou planifié.");
+    throw new ApiError(409, "Impossible de supprimer une chambre liée à un séjour actif ou Reservé.");
   }
 
   await prisma.chambre.delete({ where: { id } });
+
+  await logAudit({
+    ...auditFrom(staff),
+    action: "chambre.delete",
+    targetType: "chambre",
+    targetId: id,
+    details: {},
+  });
+
   return NextResponse.json({ ok: true });
 });

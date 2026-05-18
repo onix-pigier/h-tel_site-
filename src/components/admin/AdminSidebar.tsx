@@ -1,6 +1,6 @@
 "use client";
 
-import { BedDouble, ClipboardList, Home, LogOut, Moon, ReceiptText, Sun, UserSquare2, Users } from "lucide-react";
+import { BedDouble, History, Home, LogOut, Moon, ReceiptText, Sun, UserSquare2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -10,7 +10,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -20,18 +19,21 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
-const items = [
-  { title: "Réservations web", url: "/admin", icon: Users },
-  { title: "Attributions", url: "/admin/attribuer", icon: ClipboardList },
+const baseItems = [
+  { title: "Tableau de bord", url: "/admin/dashboard", icon: Home },
   { title: "Registre", url: "/admin/registre", icon: ReceiptText },
   { title: "Clients", url: "/admin/clients", icon: UserSquare2 },
   { title: "Chambres", url: "/admin/chambres", icon: BedDouble },
 ];
 
+const adminOnlyItems = [
+  { title: "Journal d'audit", url: "/admin/audit", icon: History },
+];
+
 export const AdminSidebar = () => {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const { signOut, user } = useAuth();
+  const { signOut, user, isAdmin } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
@@ -42,25 +44,26 @@ export const AdminSidebar = () => {
   };
 
   const isActive = (url: string) => {
-    if (url === "/admin") return pathname === "/admin";
     return pathname.startsWith(url);
   };
+
+  const visibleItems = isAdmin ? [...baseItems, ...adminOnlyItems] : baseItems;
 
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
         <div className={cn("flex items-center gap-2 px-4 py-5", collapsed && "justify-center px-2")}>
-          <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/80 flex items-center justify-center shadow-soft shrink-0">
-            <Image src="/assets/logo.png" alt="Chanaude" width={32} height={32} className="object-contain" />
+          <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/80 flex items-center justify-center shadow-soft shrink-0">
+            <Image src="/assets/logo1.png" alt="Résidences Les Chanaude" width={48} height={48} className="object-contain" priority />
           </div>
-          {!collapsed && <span className="font-display font-bold text-primary">Chanaude Admin</span>}
+          {!collapsed && <span className="font-bold text-primary text-sm leading-tight">Résidences<br/>Les Chanaude</span>}
         </div>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Exploitation</SidebarGroupLabel>
+         { /*<SidebarGroupLabel>Exploitation</SidebarGroupLabel> */}
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {visibleItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild>
                     <Link

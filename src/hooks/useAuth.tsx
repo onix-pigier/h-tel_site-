@@ -23,12 +23,12 @@ export const useAuth = (): AuthValue => {
   const loading = status === "loading";
   const user = session?.user
     ? {
-        id: (session.user as any).id ?? "",
+        id: session.user.id ?? "",
         email: session.user.email ?? "",
         name: session.user.name ?? "",
-        roles: (session.user as any).roles ?? [],
-        isStaff: (session.user as any).isStaff ?? false,
-        isAdmin: (session.user as any).isAdmin ?? false,
+        roles: session.user.roles ?? [],
+        isStaff: session.user.isStaff ?? false,
+        isAdmin: session.user.isAdmin ?? false,
       }
     : null;
 

@@ -26,6 +26,17 @@ yarn-error.log*
 # vercel
 .vercel
 
+
+
+.codex
+modif.txt
+truc.txt
+docs/cahier-audit.md
+
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prisma generated
+/src/generated/prisma/
